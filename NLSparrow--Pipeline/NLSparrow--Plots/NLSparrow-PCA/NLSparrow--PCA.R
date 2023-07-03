@@ -88,7 +88,7 @@ Shapes <- as.vector(c(15, 25, 4))
 # Creates legend plot ~
 MyLegend_Plot <-
   ggplot(data = PCA_Annot, aes_string(x = "PCA_1", y = "PCA_2")) +
-  geom_star(aes(starshape = Species, fill = Population), size = 2.8, starstroke = .15) +
+  geom_star(aes(starshape = Species, fill = Population), size = 2.8, starstroke = .15, alpha = .85) +
   scale_fill_manual(values = c("#fee8c8", "#fdbb84", "#fa9fb5", "#31a354", "#a6bddb", "#2b8cbe"), na.translate = FALSE) +
   scale_starshape_manual(values = Shapes, na.translate = F) +
   #geom_point(alpha = .9, size = 2.75, colour = "#000000", shape = 21) +
@@ -168,7 +168,7 @@ PCA_Annot$Species <- factor(PCA_Annot$Species, ordered = T,
 
 PCA_12_Blog <-
   ggplot(data = PCA_Annot, aes_string(x = "PCA_1", y = "PCA_2")) +
-  geom_star(aes(starshape = Species, fill = Population), alpha = .7, size = 2.8, starstroke = .15) +
+  geom_star(aes(starshape = Species, fill = Population), alpha = .85, size = 2.8, starstroke = .15) +
   scale_fill_manual(values = c("#fee8c8", "#fdbb84", "#fa9fb5", "#31a354", "#a6bddb", "#2b8cbe", "red")) +
   scale_starshape_manual(values = Shapes_2) +
   geom_mark_ellipse(aes(filter = Sample_ID == "PI22NLD0001M", label = "Italian-looking House Sparrow"),
@@ -212,7 +212,7 @@ PCA_Plot_Blog <- ggarrange(PCA_12_Blog, nrow = 1, legend.grob = MyLegendBlog)
 
 # Saves plot ~
 ggsave(PCA_Plot_Blog, file = "NLSparrow_Blog--PCA.pdf",
-       device = cairo_pdf, limitsize = FALSE, scale = 1, width = 9, height = 9, dpi = 600)
+       device = cairo_pdf, limitsize = FALSE, scale = 1, width = 10, height = 10, dpi = 600)
 
 
 PCA_12 <-
