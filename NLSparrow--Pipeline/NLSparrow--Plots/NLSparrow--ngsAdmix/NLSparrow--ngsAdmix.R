@@ -79,7 +79,8 @@ fulldf <- data.frame()
 
 
 # Ask Sama 2 ~
-x <- list(c(3, 4, 2, 1, 5, 6),
+x <- list(c(6, 3, 4, 2, 1, 5, 7),
+          c(3, 4, 2, 1, 5, 6),
           c(4, 5, 2, 3, 1),
           c(4, 2, 3, 1),
           c(1, 3, 2),
@@ -111,7 +112,7 @@ ngsAdmix <-
  ggplot(fulldf, aes(x = Sample_ID, y = Ancestry, fill = K)) +
  geom_bar(stat = "identity", width = .85) +
  facet_grid(K_Value ~ get(target), space = "free_x", scales = "free_x") +
- scale_fill_manual(values = c("#fdbb84", "#a6bddb", "#fee8c8", "#31a354", "#fa9fb5", "#2b8cbe")) +
+ scale_fill_manual(values = c("#fdbb84", "#a6bddb", "#fee8c8", "#31a354", "#fa9fb5", "#2b8cbe", "#a1d99b")) +
  scale_x_discrete(expand = c(0, 0)) + 
  scale_y_continuous(expand = c(0, 0), breaks = NULL) +
  theme(panel.background = element_rect(fill = "#ffffff"),
