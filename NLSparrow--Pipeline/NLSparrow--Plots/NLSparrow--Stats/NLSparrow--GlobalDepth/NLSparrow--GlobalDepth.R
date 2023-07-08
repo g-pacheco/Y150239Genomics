@@ -16,58 +16,34 @@ pacman::p_load(scales, extrafont, tidyverse, reshape2, lemon)
 
 
 # Imports extra fonts ~
-loadfonts(device = "win", quiet = TRUE)
+font_import()
 
 
 # Loads coverage data ~
 lgz <- list()
 m <- list()
-listgz <- dir(pattern = ".gz")
+listgz <- dir(pattern = "*_MinInd90.GlobalDepth.Subset.gz")
 for (k in 1:length(listgz)){
   lgz[[k]] <- read.table(gzfile(listgz[k]))
-  colnames(lgz[[k]]) <- c("CHR", "Start", "End", "Depth")
-  lgz[[k]]$Species <- gsub("*NLSparrow_MinInd90.GlobalDepth.Subset.gz", "", listgz[k])
-  lgz[[k]]$Species <- gsub("BSG_", "", lgz[[k]]$Species)}
+  colnames(lgz[[k]]) <- c("CHR", "Start", "End", "Depth")}
 
 
 # Melts PSMC data ~
-fulldfUp <- melt(lgz, id = c("CHR", "Start", "End", "Depth", "DataType"))
-fulldfUp$Type <-  ""
-
-
-# Corrects Population names ~
-levels(fulldfUp$Species <- sub("EuropeanFlounder", "European Flounder", fulldfUp$Species))
-levels(fulldfUp$Species <- sub("AtlanticCod", "Atlantic Cod", fulldfUp$Species))
-levels(fulldfUp$Species <- sub("AtlanticHerring", "Atlantic Herring", fulldfUp$Species))
-
-
-# Reorders Population ~
-fulldfUp$Species <- factor(fulldfUp$Species, ordered = T,
-                              levels = c("Turbot",
-                                         "European Flounder",
-                                         "Atlantic Cod",
-                                         "Atlantic Herring",
-                                         "Lumpfish"))
+fulldf <- melt(lgz, id = c("CHR", "Start", "End", "Depth"))
+fulldf$Type <-  ""
 
 
 # Subsamples data ~
-Turbot <- subset(fulldfUp, Species == "Turbot")
-EuropeanFlounder <- subset(fulldfUp, Species == "European Flounder")
-AtlanticCod <- subset(fulldfUp, Species == "Atlantic Cod")
-AtlanticHerring <- subset(fulldfUp, Species == "Atlantic Herring")
-Lumpfish <- subset(fulldfUp, Species == "Lumpfish")
-
-quantile(fulldfUp$Depth, c(.975))
+quantile(fulldf$Depth, c(.975))
 
 
 # Creates the plot ~
 GlobalCoverage <-
- ggplot(fulldfUp, aes(x = Depth, fill = Type, colour = Type)) +
-  geom_density(alpha = .15, size = .3) +
-  geom_vline(data = fulldfUp, aes(xintercept = quantile(Depth, c(.975))), colour = "#df65b0") +
-  facet_rep_grid(Species ~. , scales = "free_x") +
-  scale_fill_manual(values = c("#df65b0")) +
-  scale_colour_manual(values = c("#df65b0")) +
+ ggplot(fulldf, aes(x = Depth, fill = Type, colour = Type)) +
+  geom_density(alpha = .15, size = .3, adjust = 1) +
+  geom_vline(data = fulldf, aes(xintercept = quantile(Depth, c(.975))), colour = "#df65b0") +
+  scale_fill_manual(values = c("#fdbb84")) +
+  scale_colour_manual(values = c("#000000")) +
   scale_x_continuous("Global Depth (X)",
                      breaks = c(100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200),
                      labels = c("100", "200", "300", "400", "500", "600", "700", "800", "900", "1000", "1100", "1200"),
@@ -94,9 +70,9 @@ GlobalCoverage <-
 
   
 # Saves plot ~
-ggsave(GlobalCoverage, file = "BSG_Combined--GlobalDepth.pdf",
-       scale = 1, width = 12, height = 12, device = cairo_pdf, dpi = 600)
-ggsave(GlobalCoverage, file = "BSG_Combined--GlobalDepth.jpg",
+ggsave(GlobalCoverage, file = "NLSparrow--GlobalDepth.pdf",
+       scale = 1, width = 10, height = 10, device = cairo_pdf, dpi = 600)
+ggsave(GlobalCoverage, file = "NLSparrow--GlobalDepth.jpg",
        scale = 1, width = 12, height = 12, dpi = 600)
 
 
