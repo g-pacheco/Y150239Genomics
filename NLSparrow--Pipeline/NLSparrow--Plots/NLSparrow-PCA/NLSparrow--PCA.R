@@ -21,7 +21,7 @@ font_import()
 
 
 # Loads data ~
-data <- as.matrix(read.table("NLSparrow_MinInd90_SNPs.cov"), stringsAsFactors = FALSE)
+data <- as.matrix(read.table("NLSparrow.MinInd90.Autosomes_TMP_SNPs.cov"), stringsAsFactors = FALSE)
 annot <- read.table("NLSparrow.labels", sep = "\t", header = FALSE, stringsAsFactors = FALSE)
 
 
@@ -34,24 +34,23 @@ PCA_Annot <- as.data.frame(cbind(annot, PCA$vectors[, c(1:3)]))
 colnames(PCA_Annot) <- c("Sample_ID", "PCA_1", "PCA_2", "PCA_3")
 
 # Expands PCA_Annot by adding Population ~
-PCA_Annot$Population <- #ifelse(grepl("8L", PCA_Annot$Sample_ID), "Helgeland",
-                        #ifelse(grepl("8M", PCA_Annot$Sample_ID), "Helgeland",
-                        ifelse(grepl("FR0", PCA_Annot$Sample_ID), "Sales",
+PCA_Annot$Population <- ifelse(grepl("FR0", PCA_Annot$Sample_ID), "Sales",
                         ifelse(grepl("KAZ", PCA_Annot$Sample_ID), "Chokpak",
                         ifelse(grepl("Lesina", PCA_Annot$Sample_ID), "Lesina",
+                        ifelse(grepl("Crotone", PCA_Annot$Sample_ID), "Crotone",
                         ifelse(grepl("Guglionesi", PCA_Annot$Sample_ID), "Guglionesi",
                         ifelse(grepl("PI22NLD0001M", PCA_Annot$Sample_ID), NA,
                         ifelse(grepl("PD22NLD0146F", PCA_Annot$Sample_ID), "Garderen",
                         ifelse(grepl("PD22NLD0147F", PCA_Annot$Sample_ID), "Garderen",
-                        ifelse(grepl("PDOM2022NLD0", PCA_Annot$Sample_ID), "Utrecht", "Error"))))))))
+                        ifelse(grepl("PDOM2022NLD0", PCA_Annot$Sample_ID), "Utrecht", "Error")))))))))
 
 
 # Reorders Population ~
 PCA_Annot$Population <- factor(PCA_Annot$Population, ordered = T,
-                        levels = c(#"Helgeland",
-                                   "Utrecht",
+                        levels = c("Utrecht",
                                    "Sales",
                                    "Garderen",
+                                   "Crotone",
                                    "Guglionesi",
                                    "Lesina",
                                    "Chokpak",
@@ -61,7 +60,7 @@ PCA_Annot$Population <- factor(PCA_Annot$Population, ordered = T,
 # Expands PCA_Annot by adding Species ~
 PCA_Annot$Species <- ifelse(PCA_Annot$Population %in% c("Utrecht", "Sales", "Garderen"), "House",
                      ifelse(PCA_Annot$Population %in% c("Chokpak", "Lesina"), "Spanish",
-                     ifelse(PCA_Annot$Population %in% c("Guglionesi"), "Italian",
+                     ifelse(PCA_Annot$Population %in% c("Crotone", "Guglionesi"), "Italian",
                      ifelse(PCA_Annot$Population %in% NA, NA, "Error"))))
 
 
@@ -81,7 +80,7 @@ PCA_Eigenval_Sum <- sum(PCA$values)
 
 
 # Defines the shapes to be used for each Group ~
-Shapes <- as.vector(c(1, 2, 3, 13, 11, 23))
+Shapes <- as.vector(c(1, 2, 3, 13, 21, 11, 23))
 
 
 # Creates legend plot ~
@@ -125,7 +124,7 @@ MyLegend_Plot <-
 
 
 # Defines the shapes to be used for each Group ~
-Shapes_2 <- as.vector(c(1, 2, 3, 13, 11, 23, 14))
+Shapes_2 <- as.vector(c(1, 2, 3, 13, 21, 11, 23, 14))
 
 
 # Combines all populations from the Faroe Islands ~
@@ -143,10 +142,10 @@ PCA_Annot <- PCA_Annot %>%
 
 # Reorders Population ~
 PCA_Annot$Population <- factor(PCA_Annot$Population, ordered = T,
-                               levels = c(#"Helgeland",
-                                          "Utrecht",
+                               levels = c("Utrecht",
                                           "Sales",
                                           "Garderen",
+                                          "Crotone",
                                           "Guglionesi",
                                           "Lesina",
                                           "Chokpak",
@@ -164,8 +163,8 @@ PCA_Annot$Species <- factor(PCA_Annot$Species, ordered = T,
 #PCA_AnnotLabel <-  PCA_Annot %>%
 #  filter((Species == "Target"))
 
-PCA_AnnotAbridged <-  PCA_Annot %>%
-  filter((Sample_ID != "PDOM2022NLD0046M" & Sample_ID != "PDOM2022NLD0083F"))
+#PCA_AnnotAbridged <-  PCA_Annot %>%
+#  filter((Sample_ID != "PDOM2022NLD0046M" & Sample_ID != "PDOM2022NLD0083F"))
 
 
 # Expands PCA_Annot by adding Labels ~
@@ -173,7 +172,7 @@ PCA_Annot$Labels <- ifelse(PCA_Annot$Species %in% c("Target"), "Target\nIndividu
 
 
 PCA_12_Blog <-
-  ggplot(data = PCA_AnnotAbridged, aes_string(x = "PCA_1", y = "PCA_2")) +
+  ggplot(data = PCA_Annot, aes_string(x = "PCA_1", y = "PCA_2")) +
   geom_star(aes(starshape = Population, fill = Species), alpha = .85, size = 2.8, starstroke = .15) +
   scale_fill_manual(values = c("#1E90FF", "#FFD700", "#ee0000", "#d9d9d9")) +
   scale_starshape_manual(values = Shapes_2) +
@@ -191,15 +190,15 @@ PCA_12_Blog <-
   geom_mark_ellipse(aes(filter = Species == "Italian", label = "Italian\nSparrow"), con.colour = "#FFD700", colour = "#FFD700",
                     label.fill = "#d9d9d9", expand = unit(4, "mm"), con.border = "one", label.fontsize = 10.65,
                     con.type = "elbow", label.family = ".SF Compact Rounded", con.cap = 0, label.hjust = .5, show.legend = FALSE) +
-  scale_x_continuous("PC 1 (10.80%)",
+  scale_x_continuous("PC 1 (10.14%)",
                      #breaks = c(0.99, 1, 1.01),
                      #labels = c("0.99", "1", "1.01"),
                      #limits = c(-.10, .17),
                      expand = c(.02, .02)) +
-  scale_y_continuous("PC 2 (2.75%)",
+  scale_y_continuous("PC 2 (2.19%)",
                      #breaks = c(-.08, -.04, 0.00), 
                      #labels = c("-0.08", "-0.04", "0.00"),
-                     limits = c(-.11, .03),
+                     #limits = c(-.11, .03),
                      expand = c(.02, .02)) +
   theme(panel.background = element_rect(fill = "#ffffff"),
         panel.border = element_blank(),
@@ -228,8 +227,10 @@ PCA_Plot_Blog <- ggarrange(PCA_12_Blog, nrow = 1, legend.grob = MyLegendBlog)
 
 
 # Saves plot ~
-ggsave(PCA_Plot_Blog, file = "NLSparrow_Blog_Abridged-Ellipses--PCA.pdf",
-       device = cairo_pdf, limitsize = FALSE, scale = 1, width = 9, height = 9, dpi = 600)
+ggsave(PCA_Plot_Blog, file = "NLSparrow.MinInd90.Autosomes.TMP--PCA.pdf",
+       device = cairo_pdf, limitsize = FALSE, scale = 1, width = 10, height = 10, dpi = 600)
+ggsave(PCA_Plot_Blog, file = "NLSparrow_Blog_Abridged-Ellipses--PCA.png",
+       limitsize = FALSE, scale = 1, width = 9, height = 9, dpi = 600)
 
 
 PCA_12 <-

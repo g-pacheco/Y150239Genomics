@@ -37,33 +37,34 @@ colnames(ids) <- c("Sample_ID")
 
 
 # Expands ids by adding Population ~
-ids$Population <- ifelse(grepl("8L", ids$Sample_ID), "Northern Norway",
-                  ifelse(grepl("8M", ids$Sample_ID), "Northern Norway",
-                  ifelse(grepl("FR0", ids$Sample_ID), "Sales",
+ids$Population <- ifelse(grepl("FR0", ids$Sample_ID), "Sales",
                   ifelse(grepl("KAZ", ids$Sample_ID), "Chokpak",
                   ifelse(grepl("Lesina", ids$Sample_ID), "Lesina",
+                  ifelse(grepl("Crotone", ids$Sample_ID), "Crotone",
                   ifelse(grepl("Guglionesi", ids$Sample_ID), "Guglionesi",
-                  ifelse(grepl("PI22NLD0001M", ids$Sample_ID), "Target",
-                  ifelse(grepl("PD22NLD0146F", ids$Sample_ID), "Companions",
-                  ifelse(grepl("PD22NLD0147F", ids$Sample_ID), "Companions", "Error")))))))))
+                  ifelse(grepl("PI22NLD0001M", ids$Sample_ID), "Target\nIndividual",
+                  ifelse(grepl("PD22NLD0146F", ids$Sample_ID), "Garderen",
+                  ifelse(grepl("PD22NLD0147F", ids$Sample_ID), "Garderen",
+                  ifelse(grepl("PDOM2022NLD0", ids$Sample_ID), "Utrecht", "Error")))))))))
 
 
 # Reorders Population ~
 ids$Population <- factor(ids$Population, ordered = T,
-                         levels = c("Northern Norway",
+                         levels = c("Utrecht",
                                     "Sales",
+                                    "Garderen",
+                                    "Crotone",
+                                    "Guglionesi",
                                     "Lesina",
                                     "Chokpak",
-                                    "Guglionesi",
-                                    "Target", 
-                                    "Companions"))
+                                    "Target\nIndividual"))
 
 
 # Expands PCA_Annot by adding Species ~
-ids$Species <- ifelse(ids$Population %in% c("Northern Norway", "Sales", "Companions"), "House",
+ids$Species <- ifelse(ids$Population %in% c("Utrecht", "Sales", "Garderen"), "House",
                ifelse(ids$Population %in% c("Chokpak", "Lesina"), "Spanish",
-               ifelse(ids$Population %in% c("Guglionesi"), "Italian",
-               ifelse(ids$Population %in% c("Target"), "Uncertain", "Error"))))
+               ifelse(ids$Population %in% c("Guglionesi", "Crotone"), "Italian",
+               ifelse(ids$Population %in% c("Target\nIndividual"), "Uncertain", "Error"))))
 
 
 # Reorders Population ~
@@ -79,11 +80,11 @@ fulldf <- data.frame()
 
 
 # Ask Sama 2 ~
-x <- list(c(6, 3, 4, 2, 1, 5, 7),
-          c(3, 4, 2, 1, 5, 6),
-          c(4, 5, 2, 3, 1),
-          c(4, 2, 3, 1),
-          c(1, 3, 2),
+x <- list(c(1, 2, 3, 4, 5, 6, 7),
+          c(1, 2, 3, 4, 5, 6),
+          c(1, 2, 3, 4, 5),
+          c(1, 2, 3, 4),
+          c(3, 1, 2),
           c(1, 2))
 
 
@@ -122,8 +123,8 @@ ngsAdmix <-
        plot.title = element_blank(),
        legend.position = "none",
        axis.title = element_blank(),
-       #axis.text.x.bottom = element_text(colour = "#000000", face = "bold", angle = 90, vjust = .5, hjust = .5),
-       axis.text.x.bottom = element_blank(),
+       axis.text.x.bottom = element_text(colour = "#000000", face = "bold", angle = 90, vjust = .5, hjust = .5),
+       #axis.text.x.bottom = element_blank(),
        axis.text.y = element_blank(),
        axis.ticks = element_blank(),
        strip.background = element_rect(colour = "#000000", fill = "#FAFAFA", linewidth = .05),
@@ -132,7 +133,7 @@ ngsAdmix <-
  
  
  # Saves the final plot ~
- ggsave(ngsAdmix, file = "NLSparrow--ngsAdmix_RColours_TMP.pdf",
+ ggsave(ngsAdmix, file = "NLSparrow.MinInd90.Autosomes_TMP_SNPs.pdf",
         device = cairo_pdf, width = 16, height = 8, dpi = 600)
 
 
