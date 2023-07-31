@@ -1,12 +1,12 @@
-# _NL Sparrow Genomics_
+# _NL Sparrow_
 
-#### Code repository for analyses conducted in Pacheco et al. (XXX).
+#### Code repository for analyses conducted in Rowe et al. (2023).
 
 - Please visit the [Wiki page](https://github.com/g-pacheco/SparrowGenomics/wiki) for detailed information on the individual analyses.
-- The [LaTeX](https://en.wikipedia.org/wiki/LaTeX) codes used to generate the preprint version of this manuscript is available from [`SG--Article`](https://github.com/g-pacheco/SparrowGenomics/tree/main/SG--Article).
-- The Rscript used to create the map presented as Figure 1 is available from [`SG--Map`](https://github.com/g-pacheco/SparrowGenomics/blob/main/SG--Pipeline/SG--Plots/SG--Map).
+- The [LaTeX](https://en.wikipedia.org/wiki/LaTeX) codes used to generate the SI of this manuscript are available from [`NLSparrow--SI`](https://github.com/g-pacheco/NLSparrow/tree/main/NLSparrow--SI).
+- The Rscript used to create the map presented as Figure 1 is available from [`NLSparrow--Map`](https://github.com/g-pacheco/NLSparrow/blob/main/NLSparrow--Pipeline/NLSparrow--Plots/NLSparrow--Map).
 ***
 
-#### Feral pigeons in Doha, Qatar.
+#### Target individual in Garderen, The Netherlands.
 ![](https://github.com/g-pacheco/NLSparrow/blob/main/NLSparrow--Pipeline/NLSparrow--GitHubAuxiliaryFiles/NLSparrowProfile.png)
 ###### Photo courtesy of **Jaap Deene**.
