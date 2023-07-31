@@ -8,5 +8,5 @@
 ***
 
 #### Feral pigeons in Doha, Qatar.
-![](https://github.com/g-pacheco/SparrowGenomics/blob/main/SG--Pipeline/SG--GitHubAuxiliaryFiles/SG--RepositoryImage.jpg)
-###### Photo courtesy of [Marie-Christine Rufener](https://github.com/mcruf).
+![](https://github.com/g-pacheco/NLSparrow/blob/main/NLSparrow--Pipeline/NLSparrow--GitHubAuxiliaryFiles/NLSparrowProfile.png)
+###### Photo courtesy of **Jaap Deene**.
