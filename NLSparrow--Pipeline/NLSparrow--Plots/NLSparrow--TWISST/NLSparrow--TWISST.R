@@ -17,7 +17,8 @@ pacman::p_load(tidyverse, scales, reshape2, lemon)
 
 # Imports weights ~
 Wlgz <- list()
-Wlistgz <- dir (path = "../../../../LargeFiles/", pattern = ".gz")
+#Wlistgz <- dir(path = "/../../../../LargeFiles/", pattern = ".csv.gz")
+Wlistgz <- dir(pattern = ".gz")
 for (k in 1:length(Wlistgz)){
   Wlgz[[k]] <- read.table(gzfile(Wlistgz[k]))[-(1:1), ]
   colnames(Wlgz[[k]]) <- c("Target ~ Spanish", "Target ~ Italian", "Target ~ House")
@@ -32,7 +33,8 @@ WeightsDF <- WeightsDF[, -ncol(WeightsDF)]
 
 # Imports windows´ data ~
 Wilgz <- list()
-Wilistgz <- dir(path = "../../../../LargeFiles/", pattern = ".txt")
+#Wilistgz <- dir(path = "../../../../LargeFiles/", pattern = ".txt")
+Wilistgz <- dir(pattern = ".txt")
 for (k in 1:length(Wilistgz)){
   Wilgz[[k]] <- read.table(Wilistgz[k])[-1, ]
   colnames(Wilgz[[k]]) <- c("Scaffold", "Start", "End", "Mid", "Sites", "lnL")}
