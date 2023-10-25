@@ -1,6 +1,6 @@
 # _NL Sparrow_
 
-#### Code repository for analyses conducted in Rowe et al. (2023).
+#### Code repository for analyses conducted in Pacheco et al. (2024).
 
 - Please visit the [Wiki page](https://github.com/g-pacheco/SparrowGenomics/wiki) for detailed information on the individual analyses.
 - The [LaTeX](https://en.wikipedia.org/wiki/LaTeX) codes used to generate the SI of this manuscript are available from [`NLSparrow--SI`](https://github.com/g-pacheco/NLSparrow/tree/main/NLSparrow--SI).
