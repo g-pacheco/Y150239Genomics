@@ -17,10 +17,13 @@ pacman::p_load(optparse, tidyverse, plyr, RColorBrewer, extrafont, ggforce, ggst
 
 
 # Loads data ~
-dataauto <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.OnlyAutosomes.cov"), header = FALSE, stringsAsFactors = FALSE)
-datasex <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.OnlySexual.cov"), header = FALSE, stringsAsFactors = FALSE)
-#dataauto <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.Pruned.OnlyAutosomes.cov"), header = FALSE, stringsAsFactors = FALSE)
-#datasex <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.Pruned.OnlySexual.cov"), header = FALSE, stringsAsFactors = FALSE)
+#dataauto <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.OnlyAutosomes.cov"), header = FALSE, stringsAsFactors = FALSE)
+#datasex <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.OnlySexual.cov"), header = FALSE, stringsAsFactors = FALSE)
+dataauto <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.Pruned.OnlyAutosomes.cov"), header = FALSE, stringsAsFactors = FALSE)
+datasex <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.Pruned.OnlySexual.cov"), header = FALSE, stringsAsFactors = FALSE)
+
+
+# Loads annot ~
 annot <- read.table("NLSparrow.labels", sep = "\t", header = FALSE, stringsAsFactors = FALSE)
 
 
