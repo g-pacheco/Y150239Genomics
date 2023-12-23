@@ -19,18 +19,19 @@ pacman::p_load(optparse, tidyverse, plyr, RColorBrewer, extrafont, ggforce, ggst
 # Loads data ~
 #dataauto <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.OnlyAutosomes.cov"), header = FALSE, stringsAsFactors = FALSE)
 #datasex <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.OnlySexual.cov"), header = FALSE, stringsAsFactors = FALSE)
-dataauto <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.Pruned.OnlyAutosomes.cov"), header = FALSE, stringsAsFactors = FALSE)
-datasex <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.Pruned.OnlySexual.cov"), header = FALSE, stringsAsFactors = FALSE)
+#dataauto <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.Pruned.OnlyAutosomes.cov"), header = FALSE, stringsAsFactors = FALSE)
+#datasex <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.Pruned.OnlySexual.cov"), header = FALSE, stringsAsFactors = FALSE)
 
+dataauto <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20_OnlyPDOM2022NLD0046M.OnlyAutosomes.cov"), header = FALSE, stringsAsFactors = FALSE)
 
 # Loads annot ~
-annot <- read.table("NLSparrow.labels", sep = "\t", header = FALSE, stringsAsFactors = FALSE)
+#annot <- read.table("NLSparrow.labels", sep = "\t", header = FALSE, stringsAsFactors = FALSE)
+annot <- read.table("NLSparrow.OnlyPDOM2022NLD0046M.labels", sep = "\t", header = FALSE, stringsAsFactors = FALSE)
 
 
 # Runs PCA ~
 PCAauto <- eigen(dataauto)
 PCAsex <- eigen(datasex)
-
 
 
 # Merges the first 3 PCs with annot ~
@@ -45,6 +46,7 @@ PCAsex_Annot$CHR <- "Allosome (Z)"
 
 # Binds the 2 DFs based on common columns ~
 fulldf <- rbind(PCAauto_Annot, PCAsex_Annot)
+fulldf <- rbind(PCAauto_Annot)
 
 
 # Expands PCA_Annot by adding Population ~
@@ -133,7 +135,7 @@ Shapes_2 <- as.vector(c(1, 2, 3, 13, 21, 11, 23, 14))
 fulldf$Species <- as.character(fulldf$Species)
 fulldf$Population <- as.character(fulldf$Population)
 fulldf <- fulldf %>%
-  mutate_at(c("Population", "Species"), ~replace_na(., "Target"))
+  mutate_at(c("Population", "Species"), ~replace_na(., "Y150239"))
 
 
 # Reorders Population ~
@@ -145,7 +147,7 @@ fulldf$Population <- factor(fulldf$Population, ordered = T,
                                           "Guglionesi",
                                           "Lesina",
                                           "Chokpak",
-                                          "Target"))
+                                          "Y150239"))
 
 
 # Reorders Population ~
@@ -153,11 +155,11 @@ fulldf$Species <- factor(fulldf$Species, ordered = T,
                             levels = c("House",
                                        "Italian",
                                        "Spanish",
-                                       "Target"))
+                                       "Y150239"))
 
 
 # Expands PCA_Annot by adding Labels ~
-fulldf$Labels <- ifelse(fulldf$Species %in% c("Target"), "Target", "")
+fulldf$Labels <- ifelse(fulldf$Species %in% c("Y150239"), "Y150239", "")
 
 
 # Gets Eigenvalues of each Eigenvectors ~
