@@ -160,12 +160,12 @@ Y150239Genomics_Stat <-
         panel.spacing.y = unit(1, "cm"),
         axis.line = element_line(colour = "#000000", linewidth = .3),
         axis.title = element_blank(),
-        axis.text.x = element_text(colour = "#000000", size = 12, face = "bold", angle = 45, vjust = 1, hjust = 1),
-        axis.text.y = element_text(color = "#000000", size = 12, face = "bold"),
+        axis.text.x = element_text(colour = "#000000", size = 10, face = "bold", angle = 45, vjust = 1, hjust = 1),
+        axis.text.y = element_text(color = "#000000", size = 8, face = "bold"),
         axis.ticks.x = element_line(color = "#000000", linewidth = .3),
         axis.ticks.y = element_line(color = "#000000", linewidth = .3),
         strip.background.y = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
-        strip.text = element_text(colour = "#000000", size = 12, face = "bold"),
+        strip.text = element_text(colour = "#000000", size = 8, face = "bold"),
         legend.position = "top",
         legend.margin = margin(t = 0, b = 0, r = 0, l = 0),
         legend.box.margin = margin(t = 10, b = 20, r = 0, l = 0),
@@ -175,9 +175,9 @@ Y150239Genomics_Stat <-
 
 # Saves the panel ~
 ggsave(Y150239Genomics_Stat, file = "Y150239Genomics--Stats.pdf",
-       device = cairo_pdf, width = 12, height = 22, scale = 1, dpi = 600)
+       device = cairo_pdf, width = 12, height = 16, scale = 1, dpi = 600)
 ggsave(Y150239Genomics_Stat, file = "Y150239Genomics--Stats.jpeg",
-       width = 12, height = 12, scale = 1, dpi = 600)
+       width = 12, height = 16, scale = 1, dpi = 600)
 
 
 #
