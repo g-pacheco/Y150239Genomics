@@ -25,12 +25,16 @@ for (k in 1:length(annotL)){
   annot[[k]] <- read.table(annotL[k], sep = "\t", header = FALSE, stringsAsFactors = FALSE)
   colnames(annot[[k]]) <- c("Ind1")
   annot[[k]]$Ind2 <- c(annot[[k]]$Ind1[-c(1)], NA)
+  annot[[k]]$Population <- gsub("AllSamples_haplotypecaller.raw.vcf.Filtered.", "", annotL[k])
+  annot[[k]]$Population <- gsub(".labels", "", annot[[k]]$Population)
   rab[[k]] <- read.table(rabL[k], header = TRUE, stringsAsFactors = FALSE)
   rab[[k]]$a <- rab[[k]]$a + 1
   rab[[k]]$Population <- gsub("AllSamples_haplotypecaller.raw.vcf.Filtered.", "", rabL[k])
   rab[[k]]$Population <- gsub(".res", "", rab[[k]]$Population)
-  rab[[k]]$a <- annot[[k]]$Ind1[match(rab[[k]]$a, seq_along(annot[[k]]$Ind1))]
-  rab[[k]]$b <- annot[[k]]$Ind2[match(rab[[k]]$b, seq_along(annot[[k]]$Ind2))]
+  annot[[k]]$Ind1b <- paste(annot[[k]]$Population, sprintf("%02d", 1:nrow(annot[[k]])), sep = "_")
+  annot[[k]]$Ind2b <- paste(annot[[k]]$Population, sprintf("%02d", 2:nrow(annot[[k]])), sep = "_")
+  rab[[k]]$a <- annot[[k]]$Ind1b[match(rab[[k]]$a, seq_along(annot[[k]]$Ind1b))]
+  rab[[k]]$b <- annot[[k]]$Ind2b[match(rab[[k]]$b, seq_along(annot[[k]]$Ind2b))]
   rab[[k]]$Pair <- paste(rab[[k]]$a,"Vs",rab[[k]]$b)
   rab[[k]] <- rab[[k]] %>% select(a, b, rab, Pair, Population)}
 
@@ -52,11 +56,12 @@ fulldf$Population <- factor(fulldf$Population, ordered = T,
 # Creates plot (Boxplot) ~
 Kinship_Plot_Boxplot <-
   ggplot(fulldf, aes(x = Population, y = rab)) +
-  geom_boxplot(fill = "#ffffff", colour = "#000000", show.legend = FALSE, alpha = .9, linewidth = .3, width = .15) +
-  geom_point(data = subset(fulldf, rab >= .125), color = "#df65b0") +
-  geom_hline(yintercept = .125, linetype = "twodash", color = "#df65b0", linewidth = .3) +
+  geom_boxplot(fill = "#ffffff", colour = "#000000", show.legend = FALSE, linewidth = .285, width = .15, fatten = 1,
+               outlier.shape = 21, outlier.fill = "#005824", outlier.colour = "#000000", outlier.stroke = .2, outlier.alpha = .9) +
+  geom_point(data = subset(fulldf, rab >= .125), shape = 21, fill = "#df65b0", colour = "#000000", stroke = .2, alpha = .9) +
+  geom_hline(yintercept = .125, linetype = "twodash", color = "#df65b0", linewidth = .3, alpha = .9) +
   geom_label_repel(data = subset(fulldf, rab >= .125), aes(label = Pair),
-                   size = 3, nudge_x = .1, fontface = "bold", family = "Times New Roman") +
+                   size = 3, nudge_x = .1, fontface = "bold", family = "mono") +
   scale_x_discrete(expand = c(.05, .05)) +
   scale_y_continuous ("Rab", 
                       breaks = c(.1, .2, .3, .4, .5), 
@@ -95,15 +100,17 @@ ggsave(Kinship_Plot_Boxplot, file = "Y150239Genomics--Kinship_Boxplot.jpeg",
 # Creates plot (Heatmap) ~
 Kinship_Plot_Heatmap <-
   ggplot(fulldf, aes(a, b, fill = rab)) + 
-  geom_tile(colour = "#ffffff") +
-  scale_fill_continuous(trans = "reverse") +
+  geom_tile(colour = "#000000") +
+  scale_fill_continuous(low = "#ffffff", high = "#dd3497") +
+  #scale_fill_viridis(trans = "reverse", option = "plasma") +
   scale_x_discrete(expand = c(0, 0)) +
   scale_y_discrete(limits = rev, expand = c(0, 0)) +
   facet_wrap(Population ~., scales = "free", ncol = 2) +
   theme(panel.background = element_rect(fill = "#ffffff"),
         panel.border = element_blank(),
         panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.spacing = unit(1, "lines"),
         legend.position = "right",
         legend.key = element_blank(),
         legend.background = element_blank(),
@@ -114,18 +121,18 @@ Kinship_Plot_Heatmap <-
         axis.text.x = element_text(color = "#000000", size = 8.25, face = "bold", angle = 45, vjust = 1, hjust = 1),
         axis.text.y = element_text(color = "#000000", size = 8.25, face = "bold"),
         axis.ticks = element_line(color = "#000000", linewidth = .3),
-        strip.text = element_text(colour = "#000000", size = 13, face = "bold"),
+        strip.text = element_text(colour = "#000000", size = 13, face = "bold", family = "mono"),
         strip.background = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
         axis.line = element_line(colour = "#000000", linewidth = .3)) +
   guides(fill = guide_legend(title = "Rab", title.theme = element_text(size = 16, face = "bold"),
-                             label.theme = element_text(size = 15)))
+                             label.theme = element_text(size = 15), reverse = TRUE))
 
 
 # Saves plot (Heatmap) ~
 ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship_Heatmap.pdf",
        device = cairo_pdf, limitsize = FALSE, scale = 1, width = 12, height = 12, dpi = 600)
 ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship_Heatmap.jpeg",
-       limitsize = FALSE, scale = 1, width = 8, height = 5, dpi = 600)
+       limitsize = FALSE, scale = 1, width = 12, height = 12, dpi = 600)
 
 
 #
