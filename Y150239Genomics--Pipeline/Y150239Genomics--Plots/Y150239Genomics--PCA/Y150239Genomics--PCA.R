@@ -22,30 +22,31 @@ pacman::p_load(optparse, tidyverse, plyr, RColorBrewer, extrafont, ggforce, ggst
 #dataauto <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.Pruned.OnlyAutosomes.cov"), header = FALSE, stringsAsFactors = FALSE)
 #datasex <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.Pruned.OnlySexual.cov"), header = FALSE, stringsAsFactors = FALSE)
 
-dataauto <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.FilteredUp.Weight2.Pruned.MAF40.cov"), header = FALSE, stringsAsFactors = FALSE)
+#dataauto <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.NoPDOM2022NLD0083F.NoTree.cov"), header = FALSE, stringsAsFactors = FALSE)
+dataauto <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.NoPDOM2022NLD0083F.NoTree_PCANGSD.cov"), header = FALSE, stringsAsFactors = FALSE)
 
 # Loads annot ~
 #annot <- read.table("NLSparrow.labels", sep = "\t", header = FALSE, stringsAsFactors = FALSE)
-annot <- read.table("NLSparrow.labels", sep = "\t", header = FALSE, stringsAsFactors = FALSE)
+annot <- read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.NoPDOM2022NLD0083F.NoTree.labels", sep = "\t", header = FALSE, stringsAsFactors = FALSE)
 
 
 # Runs PCA ~
 PCAauto <- eigen(dataauto)
-PCAsex <- eigen(datasex)
+#PCAsex <- eigen(datasex)
 
 
 # Merges the first 3 PCs with annot ~
 PCAauto_Annot <- as.data.frame(cbind(annot, PCAauto$vectors[, c(1:3)])); colnames(PCAauto_Annot) <- c("Sample_ID", "PCA_1", "PCA_2", "PCA_3")
-PCAsex_Annot <- as.data.frame(cbind(annot, PCAsex$vectors[, c(1:3)])); colnames(PCAsex_Annot) <- c("Sample_ID", "PCA_1", "PCA_2", "PCA_3")
+#PCAsex_Annot <- as.data.frame(cbind(annot, PCAsex$vectors[, c(1:3)])); colnames(PCAsex_Annot) <- c("Sample_ID", "PCA_1", "PCA_2", "PCA_3")
 
 
 # Merges the first 3 PCs with annot ~
 PCAauto_Annot$CHR <- "Autosomes"
-PCAsex_Annot$CHR <- "Allosome (Z)"
+#PCAsex_Annot$CHR <- "Allosome (Z)"
 
 
 # Binds the 2 DFs based on common columns ~
-fulldf <- rbind(PCAauto_Annot, PCAsex_Annot)
+#fulldf <- rbind(PCAauto_Annot, PCAsex_Annot)
 fulldf <- rbind(PCAauto_Annot)
 
 
@@ -58,13 +59,15 @@ fulldf$Population <- ifelse(grepl("FR0", fulldf$Sample_ID), "Sales",
                      ifelse(grepl("PI22NLD0001M", fulldf$Sample_ID), NA,
                      ifelse(grepl("PD22NLD0146F", fulldf$Sample_ID), "Garderen",
                      ifelse(grepl("PD22NLD0147F", fulldf$Sample_ID), "Garderen",
-                     ifelse(grepl("PDOM2022NLD0", fulldf$Sample_ID), "Utrecht", "Error")))))))))
+                     ifelse(grepl("PDOM2022NLD0077M", fulldf$Sample_ID), "Meerkerk",
+                     ifelse(grepl("PDOM2022NLD0", fulldf$Sample_ID), "Utrecht", "Error"))))))))))
 
 
 # Reorders Population ~
 fulldf$Population <- factor(fulldf$Population, ordered = T,
                         levels = c("Utrecht",
                                    "Garderen",
+                                   "Meerkerk",
                                    "Sales",
                                    "Crotone",
                                    "Guglionesi",
@@ -74,7 +77,7 @@ fulldf$Population <- factor(fulldf$Population, ordered = T,
 
 
 # Expands PCA_Annot by adding Species ~
-fulldf$Species <- ifelse(fulldf$Population %in% c("Utrecht", "Sales", "Garderen"), "House",
+fulldf$Species <- ifelse(fulldf$Population %in% c("Utrecht", "Sales", "Garderen", "Meerkerk"), "House",
                   ifelse(fulldf$Population %in% c("Chokpak", "Lesina"), "Spanish",
                   ifelse(fulldf$Population %in% c("Crotone", "Guglionesi"), "Italian",
                   ifelse(fulldf$Population %in% NA, NA, "Error"))))
@@ -89,7 +92,7 @@ fulldf$Species <- factor(fulldf$Species, ordered = T,
 
 
 # Defines the shapes to be used for each Group ~
-Shapes <- as.vector(c(1, 2, 3, 13, 21, 11, 23))
+Shapes <- as.vector(c(1, 2, 3, 13, 21, 11, 23, 24))
 
 
 # Creates legend plot ~
@@ -128,7 +131,7 @@ MyLegend_Plot <-
 
 
 # Defines the shapes to be used for each Group ~
-Shapes_2 <- as.vector(c(1, 2, 3, 13, 21, 11, 23, 14))
+Shapes_2 <- as.vector(c(1, 2, 3, 13, 21, 11, 23, 24, 14))
 
 
 # Combines all populations from the Faroe Islands ~
@@ -142,6 +145,7 @@ fulldf <- fulldf %>%
 fulldf$Population <- factor(fulldf$Population, ordered = T,
                                levels = c("Utrecht",
                                           "Garderen",
+                                          "Meerkerk",
                                           "Sales",
                                           "Crotone",
                                           "Guglionesi",
@@ -193,13 +197,13 @@ PCAauto_12 <-
   #scale_x_continuous("PC 1 (5.5%)",
                      #breaks = c(0.99, 1, 1.01),
                      #labels = c("0.99", "1", "1.01"),
-                     limits = c(-.21, .21),
+                     #limits = c(-.21, .21),
                      expand = c(0, 0)) +
   scale_y_continuous("PC 2 (2.5%)",
   #scale_y_continuous("PC 2 (2.2%)",
                      #breaks = c(-.08, -.04, 0.00), 
                      #labels = c("-0.08", "-0.04", "0.00"),
-                     limits = c(-.7, .35),
+                     #limits = c(-.7, .35),
                      expand = c(0, 0)) +
   theme(panel.background = element_rect(fill = "#ffffff"),
         panel.border = element_blank(),
@@ -274,11 +278,11 @@ MyLegendBlog <- get_legend(MyLegend_Plot)
 
 
 # Gets final plot ~
-PCA_Plot <- ggarrange(PCAauto_12, PCAsex_12, nrow = 2, legend.grob = MyLegendBlog)
+PCA_Plot <- ggarrange(PCAauto_12, nrow = 1, legend.grob = MyLegendBlog)
 
 
 # Saves plot ~
-ggsave(PCA_Plot, file = "Presentation.pdf",
+ggsave(PCA_Plot, file = "XXX.pdf",
        device = cairo_pdf, limitsize = FALSE, scale = 1.1, width = 11, height = 11, dpi = 600)
 ggsave(PCA_Plot, file = "Presentation.jpeg",
       limitsize = FALSE, scale = 1.1, width = 11, height = 11, dpi = 600)

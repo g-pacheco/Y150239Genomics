@@ -119,8 +119,8 @@ ngsAdmix <-
        plot.title = element_blank(),
        legend.position = "none",
        axis.title = element_blank(),
-       #axis.text.x.bottom = element_text(colour = "#000000", face = "bold", angle = 90, vjust = .5, hjust = .5),
-       axis.text.x.bottom = element_blank(),
+       axis.text.x.bottom = element_text(colour = "#000000", face = "bold", angle = 90, vjust = .5, hjust = .5),
+       #axis.text.x.bottom = element_blank(),
        axis.text.y = element_blank(),
        axis.ticks = element_blank(),
        strip.background = element_rect(colour = "#000000", fill = "#FAFAFA", linewidth = .05),
@@ -129,7 +129,7 @@ ngsAdmix <-
  
  
  # Saves the final plot ~
- ggsave(ngsAdmix, file = "NLSparrow.MinInd90.Autosomes_TMP_SNPs.pdf",
+ ggsave(ngsAdmix, file = "NLSparrow.MinInd90.Autosomes_TMP_SNPs_XXX.pdf",
         device = cairo_pdf, width = 16, height = 8, dpi = 600)
 
 
