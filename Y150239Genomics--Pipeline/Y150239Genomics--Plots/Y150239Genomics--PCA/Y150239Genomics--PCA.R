@@ -92,7 +92,7 @@ fulldf$Species <- factor(fulldf$Species, ordered = T,
 
 
 # Defines the shapes to be used for each Group ~
-Shapes <- as.vector(c(1, 2, 3, 13, 21, 11, 23, 24))
+Shapes <- as.vector(c(1, 2, 3, 9, 13, 21, 11, 23))
 
 
 # Creates legend plot ~
@@ -101,15 +101,15 @@ MyLegend_Plot <-
   geom_star(aes(starshape = Population, fill = Species), size = 2.8, starstroke = .15, alpha = .7) +
   scale_fill_manual(values = c("#1E90FF", "#FFD700", "#ee0000"), na.translate = FALSE) +
   scale_starshape_manual(values = Shapes, na.translate = FALSE) +
-  scale_x_continuous("PC 1 (4.3%)",
+  scale_x_continuous("PC 1 (10.9%)",
                      #breaks = c(0.99, 1, 1.01),
                      #labels = c("0.99", "1", "1.01"),
                      #limits = c(-.21, .21),
                      expand = c(.005, .005)) +
-  scale_y_continuous("PC 2 (1.2%)",
+  scale_y_continuous("PC 2 (2.5%)",
                      #breaks = c(-.15, 0, .15, .3, .45), 
                      #labels = c("-.15", "0", ".15", ".3", ".45"), 
-                     #limits = c(-0.0525, 0.0525),
+                     #limits = c(-.22, .225),
                      expand = c(.03, .03)) +
   theme(panel.background = element_rect(fill = "#ffffff"),
         panel.border = element_blank(),
@@ -122,7 +122,7 @@ MyLegend_Plot <-
         legend.box = "vertical",
         legend.box.margin = margin(t = 20, b = 30, r = 0, l = 0)) +
   guides(starshape = guide_legend(title = "Population", title.theme = element_text(size = 16, face = "bold"),
-                                  label.theme = element_text(size = 15),
+                                  label.theme = element_text(size = 14.25),
                                   override.aes = list(starshape = Shapes, size = 5, starstroke = .15), nrow = 1, order = 2),
          fill = guide_legend(title = "Species", title.theme = element_text(size = 16, face = "bold"),
                              label.theme = element_text(size = 15),
@@ -131,7 +131,7 @@ MyLegend_Plot <-
 
 
 # Defines the shapes to be used for each Group ~
-Shapes_2 <- as.vector(c(1, 2, 3, 13, 21, 11, 23, 24, 14))
+Shapes_2 <- as.vector(c(1, 2, 3, 9, 13, 21, 11, 23, 14))
 
 
 # Combines all populations from the Faroe Islands ~
@@ -180,30 +180,28 @@ PCAauto_12 <-
   scale_fill_manual(values = c("#1E90FF", "#FFD700", "#ee0000", "#d9d9d9")) +
   scale_starshape_manual(values = Shapes_2) +
   geom_label_repel(data = subset(fulldf, CHR == "Autosomes"), aes(label = Labels),
-                   family = ".SF Compact Rounded", size = 3.8, fontface = "bold", max.overlaps = 100, nudge_x = .055, nudge_y = .05,
+                   family = "Optima", size = 3.8, fontface = "bold", max.overlaps = 100, nudge_x = .055, nudge_y = .05,
                    point.padding = .6, segment.size = .3, colour = "black", fill = "#d9d9d9", alpha = .85,
                    arrow = arrow(angle = 30, length = unit(.10, "inches"),
                    ends = "last", type = "open")) +
   geom_mark_ellipse(aes(filter = Species == "House", label = "House\nSparrow"), con.colour = "#1E90FF", colour = "#1E90FF",
                     label.fill = "#d9d9d9", expand = unit(4, "mm"), con.border = "one", label.fontsize = 10.65,
-                    con.type = "straight", label.family = ".SF Compact Rounded", con.cap = 0, label.hjust = .5, show.legend = FALSE) +
+                    con.type = "straight", label.family = "Optima", con.cap = 0, label.hjust = .5, show.legend = FALSE) +
   geom_mark_ellipse(aes(filter = Species == "Spanish", label = "Spanish\nSparrow"), con.colour = "#ee0000", colour = "#ee0000",
                     label.fill = "#d9d9d9", expand = unit(4, "mm"), con.border = "one", label.fontsize = 10.65,
-                    con.type = "elbow", label.family = ".SF Compact Rounded", con.cap = 0, label.hjust = .5, show.legend = FALSE) +
+                    con.type = "elbow", label.family = "Optima", con.cap = 0, label.hjust = .5, show.legend = FALSE) +
   geom_mark_ellipse(aes(filter = Species == "Italian", label = "Italian\nSparrow"), con.colour = "#FFD700", colour = "#FFD700",
                     label.fill = "#d9d9d9", expand = unit(4, "mm"), con.border = "one", label.fontsize = 10.65,
-                    con.type = "elbow", label.family = ".SF Compact Rounded", con.cap = 0, label.hjust = .5, show.legend = FALSE) +
-  scale_x_continuous("PC 1 (13.2%)",
-  #scale_x_continuous("PC 1 (5.5%)",
+                    con.type = "elbow", label.family = "Optima", con.cap = 0, label.hjust = .5, show.legend = FALSE) +
+  scale_x_continuous("PC 1 (10.9%)",
                      #breaks = c(0.99, 1, 1.01),
                      #labels = c("0.99", "1", "1.01"),
-                     #limits = c(-.21, .21),
+                     limits = c(-.1525, .18),
                      expand = c(0, 0)) +
   scale_y_continuous("PC 2 (2.5%)",
-  #scale_y_continuous("PC 2 (2.2%)",
                      #breaks = c(-.08, -.04, 0.00), 
                      #labels = c("-0.08", "-0.04", "0.00"),
-                     #limits = c(-.7, .35),
+                     limits = c(-.22, .245),
                      expand = c(0, 0)) +
   theme(panel.background = element_rect(fill = "#ffffff"),
         panel.border = element_blank(),
@@ -215,9 +213,24 @@ PCAauto_12 <-
         axis.text.x = element_text(color = "#000000", size = 11, face = "bold", angle = 45, vjust = 1, hjust = 1),
         axis.text.y = element_text(color = "#000000", size = 11, face = "bold"),
         axis.ticks = element_line(color = "#000000", linewidth = .3),
-        strip.text = element_text(colour = "#000000", size = 13, face = "bold"),
+        strip.text = element_text(colour = "#000000", size = 14, face = "bold", family = "Optima"),
         strip.background = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
         axis.line = element_line(colour = "#000000", linewidth = .3))
+
+
+# Isolates legend ~
+MyLegendBlog <- get_legend(MyLegend_Plot)
+
+
+# Gets final plot ~
+PCA_Plot <- ggarrange(PCAauto_12, nrow = 1, legend.grob = MyLegendBlog)
+
+
+# Saves plot ~
+ggsave(PCA_Plot, file = "Leiden_PCA.pdf",
+       device = cairo_pdf, limitsize = FALSE, scale = 1, width = 11, height = 11, dpi = 600)
+ggsave(PCA_Plot, file = "Leiden_PCA.jpeg",
+       limitsize = FALSE, scale = 1, width = 11, height = 11, dpi = 600)
 
 
 PCAsex_Eigenval_Sum <- sum(PCAsex$values)

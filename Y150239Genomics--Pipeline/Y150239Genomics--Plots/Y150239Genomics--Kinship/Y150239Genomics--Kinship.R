@@ -33,10 +33,12 @@ for (k in 1:length(annotL)){
   rab[[k]]$Population <- gsub(".res", "", rab[[k]]$Population)
   annot[[k]]$Ind1b <- paste(annot[[k]]$Population, sprintf("%02d", 1:nrow(annot[[k]])), sep = "_")
   annot[[k]]$Ind2b <- paste(annot[[k]]$Population, sprintf("%02d", 2:nrow(annot[[k]])), sep = "_")
-  rab[[k]]$a <- annot[[k]]$Ind1b[match(rab[[k]]$a, seq_along(annot[[k]]$Ind1b))]
-  rab[[k]]$b <- annot[[k]]$Ind2b[match(rab[[k]]$b, seq_along(annot[[k]]$Ind2b))]
-  rab[[k]]$Pair <- paste(rab[[k]]$a,"Vs",rab[[k]]$b)
-  rab[[k]] <- rab[[k]] %>% select(a, b, rab, Pair, Population)}
+  rab[[k]]$Ind1 <- annot[[k]]$Ind1b[match(rab[[k]]$a, seq_along(annot[[k]]$Ind1b))]
+  rab[[k]]$Ind2 <- annot[[k]]$Ind2b[match(rab[[k]]$b, seq_along(annot[[k]]$Ind2b))]
+  rab[[k]]$a <- annot[[k]]$Ind1[match(rab[[k]]$a, seq_along(annot[[k]]$Ind1))]
+  rab[[k]]$b <- annot[[k]]$Ind2[match(rab[[k]]$b, seq_along(annot[[k]]$Ind2))]
+  rab[[k]]$Pair <- paste(rab[[k]]$Ind1,"Vs",rab[[k]]$Ind2)
+  rab[[k]] <- rab[[k]] %>% select(Ind1, Ind2, a, b, rab, Pair, Population)}
 
 
 # Expands list ~
@@ -99,7 +101,7 @@ ggsave(Kinship_Plot_Boxplot, file = "Y150239Genomics--Kinship_Boxplot.jpeg",
 
 # Creates plot (Heatmap) ~
 Kinship_Plot_Heatmap <-
-  ggplot(fulldf, aes(a, b, fill = rab)) + 
+  ggplot(fulldf, aes(Ind1, Ind2, fill = rab)) + 
   geom_tile(colour = "#000000") +
   scale_fill_continuous(low = "#ffffff", high = "#dd3497") +
   #scale_fill_viridis(trans = "reverse", option = "plasma") +

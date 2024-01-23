@@ -119,13 +119,13 @@ ngsAdmix <-
        plot.title = element_blank(),
        legend.position = "none",
        axis.title = element_blank(),
-       axis.text.x.bottom = element_text(colour = "#000000", face = "bold", angle = 90, vjust = .5, hjust = .5),
-       #axis.text.x.bottom = element_blank(),
+       #axis.text.x.bottom = element_text(colour = "#000000", face = "bold", angle = 90, vjust = .5, hjust = .5),
+       axis.text.x.bottom = element_blank(),
        axis.text.y = element_blank(),
        axis.ticks = element_blank(),
        strip.background = element_rect(colour = "#000000", fill = "#FAFAFA", linewidth = .05),
-       strip.text.x = element_text(colour = "#000000", face = "bold", size = 16, angle = 90, margin = margin(.5, .1, .5, .1, "cm")),
-       strip.text.y = element_text(colour = "#000000", face = "bold", size = 16, angle = 90, margin = margin(0, .1, 0, .1, "cm")))
+       strip.text.x = element_text(colour = "#000000", face = "bold", family = "Optima", size = 16, angle = 90, margin = margin(.5, .1, .5, .1, "cm")),
+       strip.text.y = element_text(colour = "#000000", face = "bold", family = "Optima", size = 16, angle = 90, margin = margin(0, .1, 0, .1, "cm")))
  
  
  # Saves the final plot ~
@@ -137,16 +137,18 @@ ngsAdmix <-
 ngsAdmix_G <- ggplotGrob(ngsAdmix)
 ngsAdmix_G <- gtable_add_rows(ngsAdmix_G, unit(1.25, "cm"), pos = 5)
 
+??textGrob
+
 
 # Adds top strips ~
 ngsAdmix_G <- gtable_add_grob(ngsAdmix_G, list(rectGrob(gp = gpar(col = "#000000", fill = "#1E90FF", alpha = .7, size = .75, lwd = .25)),
-               textGrob("HOUSE", gp = gpar(cex = 1.4, fontface = 'bold', col = "black"))),
+               textGrob("HOUSE", gp = gpar(cex = 1.5, fontface = 'bold', fontfamily = "Optima", col = "black"))),
                t = 6, l = 4, b = 6, r = 9, name = c("a", "b"))
 ngsAdmix_G <- gtable_add_grob(ngsAdmix_G, list(rectGrob(gp = gpar(col = "#000000", fill = "#FFD700", alpha = .7, size = .5, lwd = .25)),
-               textGrob("ITALIAN", gp = gpar(cex = 1.4, fontface = 'bold', col = "black"))),
+               textGrob("ITALIAN", gp = gpar(cex = 1.5, fontface = 'bold', fontfamily = "Optima", col = "black"))),
                t = 6, l = 11, b = 6, r = 13, name = c("a", "b"))
 ngsAdmix_G <- gtable_add_grob(ngsAdmix_G, list(rectGrob(gp = gpar(col = "#000000", fill = "#ee0000", alpha = .7, size = .75, lwd = .25)),
-               textGrob("SPANISH", gp = gpar(cex = 1.4, fontface = 'bold', col = "black"))),
+               textGrob("SPANISH", gp = gpar(cex = 1.5, fontface = 'bold', fontfamily = "Optima", col = "black"))),
                t = 6, l = 15, b = 6, r = 17, name = c("a", "b"))
 
 
@@ -160,10 +162,10 @@ grid.draw(ngsAdmix_G)
 
 
 # Saves the final plot ~
-ggsave(ngsAdmix_G, file = "AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.OnlyAutosomes.pdf",
-       device = cairo_pdf, width = 28, height = 12, scale = .9, dpi = 600)
-ggsave(ngsAdmix_G, file = "AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.OnlyAutosomes.jpeg",
-       width = 28, height = 12, scale = .9, dpi = 600)
+ggsave(ngsAdmix_G, file = "Leiden_Admix.pdf",
+       device = cairo_pdf, width = 30, height = 12, scale = 1, dpi = 600)
+ggsave(ngsAdmix_G, file = "Leiden_Admix.jpeg",
+       width = 30, height = 12, scale = 1, dpi = 600)
 
 
 #
