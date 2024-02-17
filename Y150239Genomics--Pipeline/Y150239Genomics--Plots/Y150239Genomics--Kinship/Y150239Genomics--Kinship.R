@@ -25,12 +25,14 @@ for (k in 1:length(annotL)){
   annot[[k]] <- read.table(annotL[k], sep = "\t", header = FALSE, stringsAsFactors = FALSE)
   colnames(annot[[k]]) <- c("Ind1")
   annot[[k]]$Ind2 <- c(annot[[k]]$Ind1[-c(1)], NA)
-  annot[[k]]$Population <- gsub("AllSamples_haplotypecaller.raw.vcf.Filtered.", "", annotL[k])
+  annot[[k]]$Population <- gsub("[A-z._]*(Autosomes|Allosome).", "", annotL[k])
   annot[[k]]$Population <- gsub(".labels", "", annot[[k]]$Population)
+  annot[[k]]$CHRType <- str_extract(annotL[k], "(Allosome|Autosomes)")
   rab[[k]] <- read.table(rabL[k], header = TRUE, stringsAsFactors = FALSE)
   rab[[k]]$a <- rab[[k]]$a + 1
-  rab[[k]]$Population <- gsub("AllSamples_haplotypecaller.raw.vcf.Filtered.", "", rabL[k])
+  rab[[k]]$Population <- gsub("[A-z._]*(Autosomes|Allosome).", "", rabL[k])
   rab[[k]]$Population <- gsub(".res", "", rab[[k]]$Population)
+  rab[[k]]$CHRType <- str_extract(rabL[k], "(Allosome|Autosomes)")
   annot[[k]]$Ind1b <- paste(annot[[k]]$Population, sprintf("%02d", 1:nrow(annot[[k]])), sep = "_")
   annot[[k]]$Ind2b <- paste(annot[[k]]$Population, sprintf("%02d", 2:nrow(annot[[k]])), sep = "_")
   rab[[k]]$Ind1 <- annot[[k]]$Ind1b[match(rab[[k]]$a, seq_along(annot[[k]]$Ind1b))]
@@ -38,7 +40,7 @@ for (k in 1:length(annotL)){
   rab[[k]]$a <- annot[[k]]$Ind1[match(rab[[k]]$a, seq_along(annot[[k]]$Ind1))]
   rab[[k]]$b <- annot[[k]]$Ind2[match(rab[[k]]$b, seq_along(annot[[k]]$Ind2))]
   rab[[k]]$Pair <- paste(rab[[k]]$Ind1,"Vs",rab[[k]]$Ind2)
-  rab[[k]] <- rab[[k]] %>% select(Ind1, Ind2, a, b, rab, Pair, Population)}
+  rab[[k]] <- rab[[k]] %>% select(Ind1, Ind2, a, b, rab, Pair, CHRType, Population)}
 
 
 # Expands list ~
@@ -52,51 +54,8 @@ fulldf$Population <- factor(fulldf$Population, ordered = T,
                                        "Crotone",
                                        "Guglionesi", 
                                        "Lesina",
-                                       "Chokpak"))
-
-
-# Creates plot (Boxplot) ~
-Kinship_Plot_Boxplot <-
-  ggplot(fulldf, aes(x = Population, y = rab)) +
-  geom_boxplot(fill = "#ffffff", colour = "#000000", show.legend = FALSE, linewidth = .285, width = .15, fatten = 1,
-               outlier.shape = 21, outlier.fill = "#005824", outlier.colour = "#000000", outlier.stroke = .2, outlier.alpha = .9) +
-  geom_point(data = subset(fulldf, rab >= .125), shape = 21, fill = "#df65b0", colour = "#000000", stroke = .2, alpha = .9) +
-  geom_hline(yintercept = .125, linetype = "twodash", color = "#df65b0", linewidth = .3, alpha = .9) +
-  geom_label_repel(data = subset(fulldf, rab >= .125), aes(label = Pair),
-                   size = 3, nudge_x = .1, fontface = "bold", family = "mono") +
-  scale_x_discrete(expand = c(.05, .05)) +
-  scale_y_continuous ("Rab", 
-                      breaks = c(.1, .2, .3, .4, .5), 
-                      labels = c("0.1", "0.2", "0.3", "0.4", "0.5"),
-                      limits = c(0, .5025),
-                      expand = c(.005, .005)) +
-  theme(panel.background = element_rect(fill = "#ffffff"),
-        panel.border = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = "right",
-        legend.key = element_blank(),
-        legend.background = element_blank(),
-        legend.margin = margin(t = 0, b = 0, r = 15, l = 15),
-        legend.box = "vertical",
-        legend.box.margin = margin(t = 20, b = 30, r = 0, l = 0),
-        axis.title.x = element_blank(),
-        axis.title.y = element_text(color = "#000000", size = 12, face = "bold", margin = margin(t = 0, r = 20, b = 0, l = 0)),
-        axis.text.x = element_text(color = "#000000", size = 10, face = "bold", angle = 45, vjust = 1, hjust = 1),
-        axis.text.y = element_text(color = "#000000", size = 9, face = "bold"),
-        axis.ticks = element_line(color = "#000000", linewidth = .3),
-        strip.text = element_text(colour = "#000000", size = 13, face = "bold"),
-        strip.background = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
-        axis.line = element_line(colour = "#000000", linewidth = .3)) +
-  guides(fill = guide_legend(title = "Rab", title.theme = element_text(size = 16, face = "bold"),
-                             label.theme = element_text(size = 15)))
-
-
-# Saves plot (Boxplot) ~
-ggsave(Kinship_Plot_Boxplot, file = "Y150239Genomics--Kinship_Boxplot.pdf",
-       device = cairo_pdf, limitsize = FALSE, scale = 1, width = 8, height = 5, dpi = 600)
-ggsave(Kinship_Plot_Boxplot, file = "Y150239Genomics--Kinship_Boxplot.jpeg",
-      limitsize = FALSE, scale = 1, width = 8, height = 5, dpi = 600)
+                                       "Chokpak",
+                                       "TreeSparrow"))
 
 
 # Creates plot (Heatmap) ~
@@ -123,7 +82,7 @@ Kinship_Plot_Heatmap <-
         axis.text.x = element_text(color = "#000000", size = 8.25, face = "bold", angle = 45, vjust = 1, hjust = 1),
         axis.text.y = element_text(color = "#000000", size = 8.25, face = "bold"),
         axis.ticks = element_line(color = "#000000", linewidth = .3),
-        strip.text = element_text(colour = "#000000", size = 13, face = "bold", family = "mono"),
+        strip.text = element_text(colour = "#000000", size = 14, face = "bold", family = "Optima"),
         strip.background = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
         axis.line = element_line(colour = "#000000", linewidth = .3)) +
   guides(fill = guide_legend(title = "Rab", title.theme = element_text(size = 16, face = "bold"),
@@ -131,15 +90,77 @@ Kinship_Plot_Heatmap <-
 
 
 # Saves plot (Heatmap) ~
-ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship_Heatmap.pdf",
+ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship_Heatmap_AutosomesOnly.pdf",
        device = cairo_pdf, limitsize = FALSE, scale = 1, width = 12, height = 12, dpi = 600)
-ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship_Heatmap.jpeg",
+ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship_Heatmap_AutosomesOnly.jpeg",
        limitsize = FALSE, scale = 1, width = 12, height = 12, dpi = 600)
+
+
+# Creates plot (Boxplot) ~
+Kinship_Plot_Boxplot <-
+  ggplot(fulldf, aes(x = Population, y = rab)) +
+  geom_boxplot(fill = "#ffffff", colour = "#000000", show.legend = FALSE, linewidth = .285, width = .15, fatten = 1,
+               outlier.shape = 21, outlier.fill = "#005824", outlier.colour = "#000000", outlier.stroke = .2, outlier.alpha = .9) +
+  geom_point(data = subset(fulldf, rab >= .125), shape = 21, fill = "#df65b0", colour = "#000000", stroke = .2, alpha = .9) +
+  geom_hline(yintercept = .125, linetype = "twodash", color = "#df65b0", linewidth = .3, alpha = .9) +
+  geom_label_repel(data = subset(fulldf, rab >= .125), aes(label = Pair),
+                   size = 3, nudge_x = .1, fontface = "bold", family = "Optima") +
+  scale_x_discrete(expand = c(.05, .05)) +
+  scale_y_continuous ("Rab", 
+                      breaks = c(.1, .2, .3, .4, .5), 
+                      labels = c("0.1", "0.2", "0.3", "0.4", "0.5"),
+                      limits = c(0, .52),
+                      expand = c(.005, .005)) +
+  theme(panel.background = element_rect(fill = "#ffffff"),
+        panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "right",
+        legend.key = element_blank(),
+        legend.background = element_blank(),
+        legend.margin = margin(t = 0, b = 0, r = 15, l = 15),
+        legend.box = "vertical",
+        legend.box.margin = margin(t = 20, b = 30, r = 0, l = 0),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(color = "#000000", size = 12, face = "bold", margin = margin(t = 0, r = 20, b = 0, l = 0)),
+        axis.text.x = element_text(color = "#000000", size = 10, face = "bold", angle = 45, vjust = 1, hjust = 1),
+        axis.text.y = element_text(color = "#000000", size = 9, face = "bold"),
+        axis.ticks = element_line(color = "#000000", linewidth = .3),
+        strip.text = element_text(colour = "#000000", size = 14, face = "bold", family = "Optima"),
+        strip.background = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
+        axis.line = element_line(colour = "#000000", linewidth = .3)) +
+  guides(fill = guide_legend(title = "Rab", title.theme = element_text(size = 16, face = "bold"),
+                             label.theme = element_text(size = 15)))
+
+
+# Saves plot (Boxplot) ~
+ggsave(Kinship_Plot_Boxplot, file = "Y150239Genomics--Kinship_Boxplot_AutosomesOnly.pdf",
+       device = cairo_pdf, limitsize = FALSE, scale = 1, width = 8, height = 5, dpi = 600)
+ggsave(Kinship_Plot_Boxplot, file = "Y150239Genomics--Kinship_Boxplot_AutosomesOnly.jpeg",
+       limitsize = FALSE, scale = 1, width = 8, height = 5, dpi = 600)
 
 
 #
 ##
 ### The END ~~~~~
+
+
+# Melts data ~
+pops <- union(fulldf$Ind1, fulldf$Ind2)
+n <- length(pops)
+
+
+# Creates RabAutosomes_RabAllosome matrix ~
+RabAutosomes_RabAllosome <- matrix(0, nrow = n, ncol = n, dimnames = list(pops, pops))
+for (i in 1:nrow(fulldf)) {
+  RabAutosomes_RabAllosome[fulldf[i, "Ind1"], fulldf[i, "Ind2"]] = fulldf[i, "rab"]
+  RabAutosomes_RabAllosome[fulldf[i, "Ind2"], fulldf[i, "Ind1"]] = fulldf[i, "rab"]}
+
+
+# Creates & Saves the heatmap ~
+pheatmap(RabAutosomes_RabAllosome, cluster_rows = FALSE, cluster_cols = FALSE, border_color = "black",
+         cellwidth = 10, cellheight = 10, filename = "FPG--Fst.jpeg")
+
 
 
 # Melts data ~

@@ -33,6 +33,10 @@ Corres_5 <- as.matrix(read.table("NLSparrow_MinInd90_SNPs.5.corres"))
 Corres_6 <- as.matrix(read.table("NLSparrow_MinInd90_SNPs.6.corres"))
 Corres_7 <- as.matrix(read.table("NLSparrow_MinInd90_SNPs.7.corres"))
 
+# Plot correlation of residuals
+plotCorRes(cor_mat = Corres_2, pop = as.vector(pop[, 2]),
+           ord = ord, title = "Evaluation of 1000G admixture proportions with K=3", max_z = .1, min_z = -.1)
+
 
 # Reads the annotation file ~
 ids <- read.table("NLSparrow.labels", stringsAsFactors = FALSE, sep = "\t", header = FALSE)

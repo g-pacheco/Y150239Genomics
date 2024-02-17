@@ -1,2 +1,0 @@
-Sample	reference	comp_rate	concordant_rate	eval_variants	novel_sites	known_sites	snps	mnps	insertions	deletions	complex	symbolic	mixed	nocalls	titv_reference	known_titv	novel_titv
-AllSamples_haplotypecaller.raw.eval	none	0.0	0.0	57579357	57579357	0	50015859	0	2082432	3332845	1093216	0	1055005	826472	none	0.0	1.81
