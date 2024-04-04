@@ -47,6 +47,10 @@ for (k in 1:length(annotL)){
 fulldf <- bind_rows(rab)
 
 
+# Corrects Population names ~
+levels(fulldf$Population <- sub("TreeSparrow", "Tree Sparrow", fulldf$Population))
+
+
 # Reorders Population ~
 fulldf$Population <- factor(fulldf$Population, ordered = T,
                             levels = c("Utrecht",
@@ -55,14 +59,14 @@ fulldf$Population <- factor(fulldf$Population, ordered = T,
                                        "Guglionesi", 
                                        "Lesina",
                                        "Chokpak",
-                                       "TreeSparrow"))
+                                       "Tree Sparrow"))
 
 
 # Creates plot (Heatmap) ~
 Kinship_Plot_Heatmap <-
-  ggplot(fulldf, aes(Ind1, Ind2, fill = rab)) + 
+  ggplot(subset(fulldf, CHRType == "Autosomes"), aes(Ind1, Ind2, fill = rab)) + 
   geom_tile(colour = "#000000") +
-  scale_fill_continuous(low = "#ffffff", high = "#dd3497") +
+  scale_fill_continuous(low = "#ffffff", high = "#f768a1") +
   #scale_fill_viridis(trans = "reverse", option = "plasma") +
   scale_x_discrete(expand = c(0, 0)) +
   scale_y_discrete(limits = rev, expand = c(0, 0)) +
@@ -91,7 +95,7 @@ Kinship_Plot_Heatmap <-
 
 # Saves plot (Heatmap) ~
 ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship_Heatmap_AutosomesOnly.pdf",
-       device = cairo_pdf, limitsize = FALSE, scale = 1, width = 12, height = 12, dpi = 600)
+       device = cairo_pdf, limitsize = FALSE, scale = 1, width = 12, height = 14, dpi = 600)
 ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship_Heatmap_AutosomesOnly.jpeg",
        limitsize = FALSE, scale = 1, width = 12, height = 12, dpi = 600)
 

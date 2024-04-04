@@ -17,37 +17,34 @@ pacman::p_load(optparse, tidyverse, plyr, RColorBrewer, extrafont, ggforce, ggst
 
 
 # Loads data ~
-#dataauto <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.OnlyAutosomes.cov"), header = FALSE, stringsAsFactors = FALSE)
-#datasex <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.OnlySexual.cov"), header = FALSE, stringsAsFactors = FALSE)
-#dataauto <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.Pruned.OnlyAutosomes.cov"), header = FALSE, stringsAsFactors = FALSE)
-#datasex <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.MAF20.Pruned.OnlySexual.cov"), header = FALSE, stringsAsFactors = FALSE)
+dataauto <- as.matrix(read.table("AllSamples_bcftools.raw.vcf.Filtered.Autosomes.NoKinship.NoTreeSparrow.MAFfiltered.Pruned.PCAone.SVD0.cov"),
+                      header = FALSE, stringsAsFactors = FALSE)
+dataallo <- as.matrix(read.table("AllSamples_bcftools.raw.vcf.Filtered.Allosome.NoKinship.NoTreeSparrow.MAFfiltered.Pruned.PCAone.SVD0.cov"),
+                      header = FALSE, stringsAsFactors = FALSE)
 
-#dataauto <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.NoPDOM2022NLD0083F.NoTree.cov"), header = FALSE, stringsAsFactors = FALSE)
-dataauto <- as.matrix(read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.NoPDOM2022NLD0083F.NoTree_PCANGSD.cov"), header = FALSE, stringsAsFactors = FALSE)
 
 # Loads annot ~
-#annot <- read.table("NLSparrow.labels", sep = "\t", header = FALSE, stringsAsFactors = FALSE)
-annot <- read.table("AllSamples_haplotypecaller.raw.vcf.Filtered.NoPDOM2022NLD0083F.NoTree.labels", sep = "\t", header = FALSE, stringsAsFactors = FALSE)
+annot <- read.table("AllSamples_bcftools.raw.vcf.Filtered.Autosomes.NoKinship.NoTreeSparrow.MAFfiltered.Pruned.labels",
+                    sep = "\t", header = FALSE, stringsAsFactors = FALSE)
 
 
 # Runs PCA ~
 PCAauto <- eigen(dataauto)
-#PCAsex <- eigen(datasex)
+PCAallo <- eigen(dataallo)
 
 
 # Merges the first 3 PCs with annot ~
 PCAauto_Annot <- as.data.frame(cbind(annot, PCAauto$vectors[, c(1:3)])); colnames(PCAauto_Annot) <- c("Sample_ID", "PCA_1", "PCA_2", "PCA_3")
-#PCAsex_Annot <- as.data.frame(cbind(annot, PCAsex$vectors[, c(1:3)])); colnames(PCAsex_Annot) <- c("Sample_ID", "PCA_1", "PCA_2", "PCA_3")
+PCAallo_Annot <- as.data.frame(cbind(annot, PCAallo$vectors[, c(1:3)])); colnames(PCAallo_Annot) <- c("Sample_ID", "PCA_1", "PCA_2", "PCA_3")
 
 
 # Merges the first 3 PCs with annot ~
 PCAauto_Annot$CHR <- "Autosomes"
-#PCAsex_Annot$CHR <- "Allosome (Z)"
+PCAallo_Annot$CHR <- "Allosome (Z)"
 
 
 # Binds the 2 DFs based on common columns ~
-#fulldf <- rbind(PCAauto_Annot, PCAsex_Annot)
-fulldf <- rbind(PCAauto_Annot)
+fulldf <- rbind(PCAauto_Annot, PCAallo_Annot)
 
 
 # Expands PCA_Annot by adding Population ~
@@ -102,14 +99,8 @@ MyLegend_Plot <-
   scale_fill_manual(values = c("#1E90FF", "#FFD700", "#ee0000"), na.translate = FALSE) +
   scale_starshape_manual(values = Shapes, na.translate = FALSE) +
   scale_x_continuous("PC 1 (10.9%)",
-                     #breaks = c(0.99, 1, 1.01),
-                     #labels = c("0.99", "1", "1.01"),
-                     #limits = c(-.21, .21),
                      expand = c(.005, .005)) +
   scale_y_continuous("PC 2 (2.5%)",
-                     #breaks = c(-.15, 0, .15, .3, .45), 
-                     #labels = c("-.15", "0", ".15", ".3", ".45"), 
-                     #limits = c(-.22, .225),
                      expand = c(.03, .03)) +
   theme(panel.background = element_rect(fill = "#ffffff"),
         panel.border = element_blank(),
@@ -166,7 +157,7 @@ fulldf$Species <- factor(fulldf$Species, ordered = T,
 fulldf$Labels <- ifelse(fulldf$Species %in% c("Y150239"), "Y150239", "")
 
 
-# Gets Eigenvalues of each Eigenvectors ~
+# Gets Eigenvalues of each Eigenvectors (Allosome) ~
 PCAauto_Eigenval_Sum <- sum(PCAauto$values)
 (PCAauto$values[1]/PCAauto_Eigenval_Sum)*100
 (PCAauto$values[2]/PCAauto_Eigenval_Sum)*100
@@ -175,13 +166,13 @@ PCAauto_Eigenval_Sum <- sum(PCAauto$values)
 
 PCAauto_12 <-
   ggplot(data = subset(fulldf, CHR == "Autosomes"), aes_string(x = "PCA_1", y = "PCA_2")) +
-  geom_star(aes(starshape = Population, fill = Species), alpha = .7, size = 2.8, starstroke = .15) +
+  geom_star(aes(starshape = Population, fill = Species), alpha = .7, size = 2.15, starstroke = .15) +
   facet_rep_grid(CHR ~. , scales = "free_x") +
   scale_fill_manual(values = c("#1E90FF", "#FFD700", "#ee0000", "#d9d9d9")) +
   scale_starshape_manual(values = Shapes_2) +
   geom_label_repel(data = subset(fulldf, CHR == "Autosomes"), aes(label = Labels),
-                   family = "Optima", size = 3.8, fontface = "bold", max.overlaps = 100, nudge_x = .055, nudge_y = .05,
-                   point.padding = .6, segment.size = .3, colour = "black", fill = "#d9d9d9", alpha = .85,
+                   family = "Optima", size = 3.8, fontface = "bold", max.overlaps = 100, nudge_x = -.055, nudge_y = .05,
+                   point.padding = .6, force_pull = 10, segment.size = .3, colour = "black", fill = "#d9d9d9", alpha = .85,
                    arrow = arrow(angle = 30, length = unit(.10, "inches"),
                    ends = "last", type = "open")) +
   geom_mark_ellipse(aes(filter = Species == "House", label = "House\nSparrow"), con.colour = "#1E90FF", colour = "#1E90FF",
@@ -193,15 +184,15 @@ PCAauto_12 <-
   geom_mark_ellipse(aes(filter = Species == "Italian", label = "Italian\nSparrow"), con.colour = "#FFD700", colour = "#FFD700",
                     label.fill = "#d9d9d9", expand = unit(4, "mm"), con.border = "one", label.fontsize = 10.65,
                     con.type = "elbow", label.family = "Optima", con.cap = 0, label.hjust = .5, show.legend = FALSE) +
-  scale_x_continuous("PC 1 (10.9%)",
+  scale_x_continuous("PC 1 (5.55%)",
                      #breaks = c(0.99, 1, 1.01),
                      #labels = c("0.99", "1", "1.01"),
-                     limits = c(-.1525, .18),
+                     limits = c(-.2, .2),
                      expand = c(0, 0)) +
-  scale_y_continuous("PC 2 (2.5%)",
+  scale_y_continuous("PC 2 (1.96%)",
                      #breaks = c(-.08, -.04, 0.00), 
                      #labels = c("-0.08", "-0.04", "0.00"),
-                     limits = c(-.22, .245),
+                     limits = c(-.31, .35),
                      expand = c(0, 0)) +
   theme(panel.background = element_rect(fill = "#ffffff"),
         panel.border = element_blank(),
@@ -218,35 +209,21 @@ PCAauto_12 <-
         axis.line = element_line(colour = "#000000", linewidth = .3))
 
 
-# Isolates legend ~
-MyLegendBlog <- get_legend(MyLegend_Plot)
+# Gets Eigenvalues of each Eigenvectors (Autosomes) ~
+PCAallo_Eigenval_Sum <- sum(PCAallo$values)
+(PCAallo$values[1]/PCAallo_Eigenval_Sum)*100
+(PCAallo$values[2]/PCAallo_Eigenval_Sum)*100
+(PCAallo$values[3]/PCAallo_Eigenval_Sum)*100
 
 
-# Gets final plot ~
-PCA_Plot <- ggarrange(PCAauto_12, nrow = 1, legend.grob = MyLegendBlog)
-
-
-# Saves plot ~
-ggsave(PCA_Plot, file = "Leiden_PCA.pdf",
-       device = cairo_pdf, limitsize = FALSE, scale = 1, width = 11, height = 11, dpi = 600)
-ggsave(PCA_Plot, file = "Leiden_PCA.jpeg",
-       limitsize = FALSE, scale = 1, width = 11, height = 11, dpi = 600)
-
-
-PCAsex_Eigenval_Sum <- sum(PCAsex$values)
-(PCAsex$values[1]/PCAsex_Eigenval_Sum)*100
-(PCAsex$values[2]/PCAsex_Eigenval_Sum)*100
-(PCAsex$values[3]/PCAsex_Eigenval_Sum)*100
-
-
-PCAsex_12 <-
+PCAallo_12 <-
   ggplot(data = subset(fulldf, CHR == "Allosome (Z)"), aes_string(x = "PCA_1", y = "PCA_2")) +
-  geom_star(aes(starshape = Population, fill = Species), alpha = .7, size = 2.8, starstroke = .15) +
+  geom_star(aes(starshape = Population, fill = Species), alpha = .7, size = 2.15, starstroke = .15) +
   facet_rep_grid(CHR ~. , scales = "free_x") +
   scale_fill_manual(values = c("#1E90FF", "#FFD700", "#ee0000", "#d9d9d9")) +
   scale_starshape_manual(values = Shapes_2) +
   geom_label_repel(data = subset(fulldf, CHR == "Allosome (Z)"), aes(label = Labels),
-                   family = ".SF Compact Rounded", size = 3.8, fontface = "bold", max.overlaps = 100, nudge_x = .055, nudge_y = .25,
+                   family = ".SF Compact Rounded", size = 3.8, fontface = "bold", max.overlaps = 100, nudge_x = .040, nudge_y = -.1,
                    point.padding = .6, segment.size = .3, colour = "black", fill = "#d9d9d9", alpha = .85,
                    arrow = arrow(angle = 30, length = unit(.10, "inches"),
                                  ends = "last", type = "open")) +
@@ -259,17 +236,15 @@ PCAsex_12 <-
   geom_mark_ellipse(aes(filter = Species == "Italian", label = "Italian\nSparrow"), con.colour = "#FFD700", colour = "#FFD700",
                     label.fill = "#d9d9d9", expand = unit(4, "mm"), con.border = "one", label.fontsize = 10.65,
                     con.type = "elbow", label.family = ".SF Compact Rounded", con.cap = 0, label.hjust = .5, show.legend = FALSE) +
-  scale_x_continuous("PC 1 (19.0%)",
-  #scale_x_continuous("PC 1 (9.1%)",
+  scale_x_continuous("PC 1 (8.76%)",
                      #breaks = c(0.99, 1, 1.01),
                      #labels = c("0.99", "1", "1.01"),
-                     limits = c(-.21, .21),
+                     limits = c(-.17, .19),
                      expand = c(0, 0)) +
-  scale_y_continuous("PC 2 (6.7%)",
-  #scale_y_continuous("PC 2 (3.8%)",
+  scale_y_continuous("PC 2 (4.19%)",
                      #breaks = c(-.08, -.04, 0.00), 
                      #labels = c("-0.08", "-0.04", "0.00"),
-                     limits = c(-.7, .35),
+                     limits = c(-.31, .35),
                      expand = c(0, 0)) +
   theme(panel.background = element_rect(fill = "#ffffff"),
         panel.border = element_blank(),
@@ -281,7 +256,7 @@ PCAsex_12 <-
         axis.text.x = element_text(color = "#000000", size = 11, face = "bold", angle = 45, vjust = 1, hjust = 1),
         axis.text.y = element_text(color = "#000000", size = 11, face = "bold"),
         axis.ticks = element_line(color = "#000000", linewidth = .3),
-        strip.text = element_text(colour = "#000000", size = 13, face = "bold"),
+        strip.text = element_text(colour = "#000000", size = 13, family = "Optima", face = "bold"),
         strip.background = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
         axis.line = element_line(colour = "#000000", linewidth = .3))
 
@@ -294,9 +269,17 @@ MyLegendBlog <- get_legend(MyLegend_Plot)
 PCA_Plot <- ggarrange(PCAauto_12, nrow = 1, legend.grob = MyLegendBlog)
 
 
+# Isolates legend ~
+MyLegendBlog <- get_legend(MyLegend_Plot)
+
+
+# Gets final plot ~
+PCA_Plot <- ggarrange(PCAauto_12, PCAallo_12, nrow = 2, legend.grob = MyLegendBlog)
+
+
 # Saves plot ~
-ggsave(PCA_Plot, file = "XXX.pdf",
-       device = cairo_pdf, limitsize = FALSE, scale = 1.1, width = 11, height = 11, dpi = 600)
+ggsave(PCA_Plot, file = "YYY.pdf",
+       device = cairo_pdf, limitsize = FALSE, scale = 1, width = 11, height = 11, dpi = 600)
 ggsave(PCA_Plot, file = "Presentation.jpeg",
       limitsize = FALSE, scale = 1.1, width = 11, height = 11, dpi = 600)
 
@@ -304,3 +287,28 @@ ggsave(PCA_Plot, file = "Presentation.jpeg",
 #
 ##
 ### The END ~~~~~
+
+
+geom_label_repel(data = subset(fulldf, CHR == "Autosomes"), aes(label = Sample_ID),
+                 family = "Optima", size = 3.8, fontface = "bold", max.overlaps = 100, nudge_x = .055, nudge_y = .05,
+                 point.padding = .6, force_pull = 10, segment.size = .3, colour = "black", fill = "#d9d9d9", alpha = .85,
+                 arrow = arrow(angle = 30, length = unit(.10, "inches"),
+                               ends = "last", type = "open")) +
+
+cov <- list()
+covL <- dir(pattern = ".res")
+for (k in 1:length(covL)){
+  cov[[k]] <- read.table(annotL[k], sep = "\t", header = FALSE, stringsAsFactors = FALSE)
+  colnames(cov[[k]]) <- c("Ind1")
+  cov[[k]]$Ind2 <- c(cov[[k]]$Ind1[-c(1)], NA)
+  cov[[k]]$Population <- gsub("[A-z._]*(Autosomes|Allosome).", "", annotL[k])
+  cov[[k]]$Population <- gsub(".labels", "", annot[[k]]$Population)
+  cov[[k]]$CHRType <- str_extract(annotL[k], "(Allosome|Autosomes)")
+  cov[[k]]$Ind1b <- paste(annot[[k]]$Population, sprintf("%02d", 1:nrow(annot[[k]])), sep = "_")
+  cov[[k]]$Ind2b <- paste(annot[[k]]$Population, sprintf("%02d", 2:nrow(annot[[k]])), sep = "_")
+  rab[[k]]$Ind1 <- annot[[k]]$Ind1b[match(rab[[k]]$a, seq_along(annot[[k]]$Ind1b))]
+  rab[[k]]$Ind2 <- annot[[k]]$Ind2b[match(rab[[k]]$b, seq_along(annot[[k]]$Ind2b))]
+  rab[[k]]$a <- annot[[k]]$Ind1[match(rab[[k]]$a, seq_along(annot[[k]]$Ind1))]
+  rab[[k]]$b <- annot[[k]]$Ind2[match(rab[[k]]$b, seq_along(annot[[k]]$Ind2))]
+  rab[[k]]$Pair <- paste(rab[[k]]$Ind1,"Vs",rab[[k]]$Ind2)
+  rab[[k]] <- rab[[k]] %>% select(Ind1, Ind2, a, b, rab, Pair, CHRType, Population)}
