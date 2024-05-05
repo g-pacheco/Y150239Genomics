@@ -17,16 +17,11 @@ source("visFuns.R")
 
 
 # Loads the data ~
-Corres_2 <- as.matrix(read.table("AllSamples_bcftools.raw.vcf.Filtered.Allosome.NoKinship.NoTreeSparrow.MAFfiltered.Pruned.K2.corres")) 
-Corres_3 <- as.data.frame(read.table("AllSamples_bcftools.raw.vcf.Filtered.Allosome.NoKinship.NoTreeSparrow.MAFfiltered.Pruned.K3.corres"))
-Corres_4 <- as.data.frame(read.table("AllSamples_bcftools.raw.vcf.Filtered.Allosome.NoKinship.NoTreeSparrow.MAFfiltered.Pruned.K4.corres"))
-Corres_5 <- as.data.frame(read.table("AllSamples_bcftools.raw.vcf.Filtered.Allosome.NoKinship.NoTreeSparrow.MAFfiltered.Pruned.K5.corres"))
-Corres_6 <- as.data.frame(read.table("AllSamples_bcftools.raw.vcf.Filtered.Allosome.NoKinship.NoTreeSparrow.MAFfiltered.Pruned.K6.corres"))
-Corres_7 <- as.data.frame(read.table("AllSamples_bcftools.raw.vcf.Filtered.Allosome.NoKinship.NoTreeSparrow.MAFfiltered.Pruned.K7.corres"))
+Corres_2 <- as.matrix(read.table("AllSamples_bcftools.raw.vcf.Filtered.Autosomes.NoKinship.NoTreeSparrow.MAFfiltered.Pruned.K2.corres")) 
 
 
 # Reads the annotation file ~
-ids <- read.table("Y150239Genomics--ngsAdmix.labels", stringsAsFactors = FALSE, sep = "\t", header = FALSE)
+ids <- read.table("AllSamples_bcftools.raw.vcf.Filtered.Autosomes.NoKinship.NoTreeSparrow.MAFfiltered.Pruned.K2.labels", stringsAsFactors = FALSE, sep = "\t", header = FALSE)
 
 
 # Adds column ids names ~
