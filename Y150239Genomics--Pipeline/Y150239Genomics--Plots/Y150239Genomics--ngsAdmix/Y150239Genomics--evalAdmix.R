@@ -7,13 +7,14 @@
 rm(list=ls())
 
 
-# Loads required packages ~
-pacman::p_load(tidyverse, reshape2, pheatmap, scales, optparse, plyr, RColorBrewer, extrafont)
-source("visFuns.R")
-
-
 # Sets working directory ~
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
+
+# Loads required packages ~
+pacman::p_load(tidyverse)
+source("visFuns.R")
+
 
 # Imports data while incorporating annotation ~
 corres <- list()
@@ -22,24 +23,24 @@ corres_files <- dir(pattern = ".corres")
 annot_files <- dir(pattern = ".labels")
 for (k in seq_along(annot_files)) {
   annot[[k]] <- read.table(annot_files[k], sep = "\t", header = FALSE, stringsAsFactors = FALSE)
-  colnames(annot[[k]]) <- c("Sample_ID")
-  annot[[k]]$Population <- ifelse(grepl("FR0", annot[[k]]$Sample_ID), "Sales",
-                                  ifelse(grepl("KAZ", annot[[k]]$Sample_ID), "Chokpak",
-                                         ifelse(grepl("Lesina", annot[[k]]$Sample_ID), "Lesina",
-                                                ifelse(grepl("Crotone", annot[[k]]$Sample_ID), "Crotone",
-                                                       ifelse(grepl("Guglionesi", annot[[k]]$Sample_ID), "Guglionesi",
-                                                              ifelse(grepl("PI22NLD0001M", annot[[k]]$Sample_ID), "Y150239",
-                                                                     ifelse(grepl("PD22NLD0146F", annot[[k]]$Sample_ID), "Garderen",
-                                                                            ifelse(grepl("PD22NLD0147F", annot[[k]]$Sample_ID), "Garderen",
-                                                                                   ifelse(grepl("PDOM2022NLD0077M", annot[[k]]$Sample_ID), "Meerkerk",
-                                                                                          ifelse(grepl("PDOM2022NLD0", annot[[k]]$Sample_ID), "Utrecht", "Error"))))))))))
+  colnames(annot[[k]]) <- c("Annot")
+  annot[[k]]$Population_1 <- ifelse(grepl("FR0", annot[[k]]$Annot), "Sales",
+                           ifelse(grepl("KAZ", annot[[k]]$Annot), "Chokpak",
+                           ifelse(grepl("Lesina", annot[[k]]$Annot), "Lesina",
+                           ifelse(grepl("Crotone", annot[[k]]$Annot), "Crotone",
+                           ifelse(grepl("Guglionesi", annot[[k]]$Annot), "Guglionesi",
+                           ifelse(grepl("PI22NLD0001M", annot[[k]]$Annot), "Y150239",
+                           ifelse(grepl("PD22NLD0146F", annot[[k]]$Annot), "Garderen",
+                           ifelse(grepl("PD22NLD0147F", annot[[k]]$Annot), "Garderen",
+                           ifelse(grepl("PDOM2022NLD0077M", annot[[k]]$Annot), "Meerkerk",
+                           ifelse(grepl("PDOM2022NLD0", annot[[k]]$Annot), "Utrecht", "Error"))))))))))
   corres_df <- as.data.frame(read.table(corres_files[k]))
-  rownames(corres_df) <- annot[[k]]$Sample_ID
-  colnames(corres_df) <- annot[[k]]$Sample_ID
+  rownames(corres_df) <- annot[[k]]$Annot
+  colnames(corres_df) <- annot[[k]]$Annot
   corres_df$CHRType <- str_extract(corres_files[k], "(Allosome|Autosomes)")
   corres_df$K <- str_extract(corres_files[k], "(K2|K3|K4|K5|K6|K7)")
-  corres[[k]] <- corres_df
-}
+  corres[[k]] <- corres_df}
+
 
 # Perform individual computation ~
 compute_on_matrices <- function(corres_ind_list, pop_list, ord_list) {
@@ -47,82 +48,197 @@ compute_on_matrices <- function(corres_ind_list, pop_list, ord_list) {
     corres_ind <- corres_ind_list[[i]]
     pop <- pop_list[[i]]
     ord <- ord_list[[i]]
-    corres_sub <- corres_ind
-    
-    # Create annotation data frame
-    annotation_df <- data.frame(Sample_ID = rownames(corres_sub),
-                                CHRType = rep(NA, nrow(corres_sub)),
-                                K = rep(NA, nrow(corres_sub)))
-    
-    # Match population and add annotation columns
+    annotation_df <- data.frame(Sample_ID_1 = rownames(corres_ind), Population_1 = pop)
     for (j in 1:length(pop)) {
-      annotation_df[pop == names(pop[j]), c("CHRType", "K")] <- unique(ord[pop == names(pop[j])])
-    }
-    
-    # Combine annotation and individual matrix
-    indiv_matrix <- cbind(annotation_df, corres_sub)
-    
-    return(indiv_matrix)
-  })
+      pop_name <- pop[j]
+      if (pop_name %in% names(ord)) {
+        pop_ord <- ord[[pop_name]]
+        chr_type <- unique(pop_ord$CHRType)
+        k_val <- unique(pop_ord$K)
+        annotation_df$CHRType[pop == pop_name] <- chr_type
+        annotation_df$K[pop == pop_name] <- k_val}}
+    indiv_matrix <- cbind(annotation_df, corres_ind)
+    return(indiv_matrix)})
   return(result)}
-
-
-compute_mean_correlation <- function(corres_ind, pop, exclude_cols) {
-  N <- length(pop)
-  mean_cors <- matrix(NA, ncol = length(unique(pop)), nrow = length(unique(pop)))
-  colnames(mean_cors) <- unique(pop)
-  rownames(mean_cors) <- unique(pop)
-  
-  for (i1 in 1:(length(unique(pop)))) {
-    for (i2 in 1:(length(unique(pop)))) {
-      p1 <- unique(pop)[i1]
-      p2 <- unique(pop)[i2]
-      
-      # Filter out annotation columns if corres_sub has columns
-      corres_sub <- corres_ind[which(pop == p1), which(pop == p2)]
-      
-      # Handle NAs in corres_sub
-      corres_sub[is.na(corres_sub)] <- 0
-      
-      # Check if corres_sub is not empty
-      if (!is.null(corres_sub) && nrow(corres_sub) > 0 && ncol(corres_sub) > 0) {
-        # Check if there's only one individual in one or both populations
-        if (nrow(corres_sub) <= 1 || ncol(corres_sub) <= 1) {
-          mean_cors[i1, i2] <- 0
-        } else {
-          mean_cors[i1, i2] <- mean(corres_sub, na.rm = TRUE)
-        }
-      } else {
-        mean_cors[i1, i2] <- NA
-      }
-    }
-  }
-  return(mean_cors)
-}
 
 
 # Applies functions ~
 main_list <- compute_on_matrices(corres_ind_list = corres,
-                                 pop_list = lapply(annot, function(ann) ann$Population),
+                                 pop_list = lapply(annot, function(ann) ann$Population_1),
                                  ord_list = lapply(corres, orderInds))
 
 
+# Convert all matrices to numeric type
+main_list <- lapply(main_list, as.matrix)
+main_list <- lapply(main_list, as.data.frame)
+
+
+# Combine all matrices into a single dataset
+combined_data <- bind_rows(main_list, .id = "Matrix_ID")
+
+
+# Select relevant columns and convert data from wide to long format
+long_format <- combined_data %>%
+  pivot_longer(cols = -c(Matrix_ID, Sample_ID_1, Population_1, CHRType, K),
+               names_to = "Var2",
+               values_to = "value")
+
+
+# Renames some columns and select the relevant ones ~ 
+fulldf_ind <- long_format %>%
+  rename_with(~"Sample_ID_2", Var2) %>%
+  rename_with(~"Value", value) %>%
+  select(Sample_ID_1, Sample_ID_2, Population_1, CHRType, K, Value) %>%
+  ungroup()
+
+
+# Gets Population_2 ~
+fulldf_ind <- fulldf_ind %>%
+  mutate(Population_2 = ifelse(grepl("FR0", Sample_ID_2), "Sales",
+                        ifelse(grepl("KAZ", Sample_ID_2), "Chokpak",
+                        ifelse(grepl("Lesina", Sample_ID_2), "Lesina",
+                        ifelse(grepl("Crotone", Sample_ID_2), "Crotone",
+                        ifelse(grepl("Guglionesi", Sample_ID_2), "Guglionesi",
+                        ifelse(grepl("PI22NLD0001M", Sample_ID_2), "Y150239",
+                        ifelse(grepl("PD22NLD0146F", Sample_ID_2), "Garderen",
+                        ifelse(grepl("PD22NLD0147F", Sample_ID_2), "Garderen",
+                        ifelse(grepl("PDOM2022NLD0077M", Sample_ID_2), "Meerkerk",
+                        ifelse(grepl("PDOM2022NLD0", Sample_ID_2), "Utrecht", "Error"))))))))))) %>%
+           select(1:3, Population_2, everything())
+  
+
+# Gets Indexes_1 ~
+Indexes_1 <- fulldf_ind %>%
+  filter(CHRType == "Allosome" & K == "K2") %>%
+  group_by(Population_1, Sample_ID_1) %>%
+  mutate(first_occurrence = row_number() == 1) %>%
+  filter(first_occurrence == TRUE) %>%
+  group_by(Population_1) %>%
+  mutate(Ind_1 = paste0(Population_1, "_", sprintf("%02d", ave(seq_along(Population_1), Population_1, FUN = seq_along)))) %>%
+  select(Sample_ID_1, Ind_1) %>%
+  ungroup()
+Indexes_1 <- Indexes_1 %>%
+            select(-Population_1)
+
+# Gets Ind_1 ~
+fulldf_ind <- merge(fulldf_ind, Indexes_1, by.x = "Sample_ID_1" , all.x = TRUE)
+
+
+# Gets Indexes_2 ~
+Indexes_2 <- fulldf_ind %>%
+  filter(CHRType == "Allosome" & K == "K2") %>%
+  group_by(Population_2, Sample_ID_2) %>%
+  mutate(first_occurrence = row_number() == 1) %>%
+  filter(first_occurrence == TRUE) %>%
+  group_by(Population_2) %>%
+  mutate(Ind_2 = paste0(Population_2, "_", sprintf("%02d", ave(seq_along(Population_2), Population_2, FUN = seq_along)))) %>%
+  select(Sample_ID_2, Ind_2) %>%
+  ungroup()
+Indexes_2 <- Indexes_2 %>%
+  select(-Population_2)
+
+
+# Gets Ind_2 ~
+fulldf_ind <- merge(fulldf_ind, Indexes_2, by.x = "Sample_ID_2" , all.x = TRUE)
+
+
+# Reorders columns ~
+fulldf_ind <- fulldf_ind %>%
+              select(Sample_ID_1, Sample_ID_2, Population_1, Population_2, Ind_1, Ind_2, CHRType, K, Value)
+
+
+# Converts NAs into 10s ~
+fulldf_ind <- replace(fulldf_ind, is.na(fulldf_ind), 10)
 
 
 
-IND <- corres_results[[1]][["individual"]]
-MEAN <- corres_results[[1]][["mean_correlation"]]
+fulldf_ind_less <- fulldf_ind %>%
+              rowwise() %>%
+              mutate(combination = paste(sort(c(Ind_1, Ind_2)), collapse = "_")) %>%
+              distinct(combination, .keep_all = TRUE) %>%
+              select(-combination)
+
+
+fulldf_ind_less2 <- fulldf_ind %>%
+                    mutate(Ind_1 = as.character(Ind_1),
+                    Ind_2 = as.character(Ind_2),
+                    sorted_pair = ifelse(Ind_1 < Ind_2, paste0(Ind_1, Ind_2), paste0(Ind_2, Ind_1))) %>%
+                    distinct(sorted_pair, .keep_all = TRUE) %>%
+                    select(-sorted_pair)
+
+
+# Defines colour palette ~
+color_palette <- c("#001260", "#EAEDE9", "#601200")
+
+
+# Make sure col palette is centered on 0 ~
+Min <- -0.1
+Max <- 0.1
+Thresh <- 0
+nHalf <- 10
+
+# Defines the breaks ~
+rb1 <- seq(Min, Thresh, length.out = nHalf + 1)
+rb2 <- seq(Thresh, Max, length.out = nHalf + 1)[-1]
+breaks <- c(rb1, rb2)
+
+## Make vector of colors for values below threshold
+rc1 <- colorRampPalette(colors = color_palette[1:2], space = "Lab")(nHalf)
+
+## Make vector of colors for values above threshold
+rc2 <- colorRampPalette(colors = color_palette[2:3], space="Lab")(nHalf)
+rampcols <- c(rc1, rc2)
+
+
+rb1 <- seq(Min, Thresh, length.out=nHalf+1)
+rb2 <- seq(Thresh, Max, length.out=nHalf+1)[-1]
+rampbreaks <- c(rb1, rb2)
+
+
+# Creates plot (Heatmap) ~
+CareBears <-
+  ggplot(fulldf_ind, aes(Ind_1, Ind_2, fill = as.numeric(Value))) + 
+  geom_tile(colour = "#000000") +
+  scale_fill_continuous(low = "#ffffff", high = "#f768a1") +
+  scale_x_discrete(expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  facet_grid(K ~ CHRType) +
+  theme(panel.background = element_rect(fill = "#ffffff"),
+        panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.spacing = unit(1, "lines"),
+        legend.position = "right",
+        legend.key = element_blank(),
+        legend.background = element_blank(),
+        legend.margin = margin(t = 0, b = 0, r = 15, l = 15),
+        legend.box = "vertical",
+        legend.box.margin = margin(t = 20, b = 30, r = 0, l = 0),
+        axis.title = element_blank(),
+        axis.text.x = element_text(color = "#000000", size = 8.25, face = "bold", angle = 45, vjust = 1, hjust = 1),
+        axis.text.y = element_text(color = "#000000", size = 8.25, face = "bold"),
+        axis.ticks = element_line(color = "#000000", linewidth = .3),
+        strip.text = element_text(colour = "#000000", size = 14, face = "bold", family = "Optima"),
+        strip.background = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
+        axis.line = element_line(colour = "#000000", linewidth = .3)) +
+  guides(fill = guide_legend(title = "", title.theme = element_text(size = 16, face = "bold"),
+                             label.theme = element_text(size = 15), reverse = TRUE))
+
+
+# Saves plot (Boxplot) ~
+ggsave(CareBears, file = "CareBears.pdf",
+       device = cairo_pdf, limitsize = FALSE, scale = 1, width = 30, height = 50, dpi = 600)
+ggsave(CareBears, file = "CareBears.png",
+       limitsize = FALSE, scale = 1, width = 20, height = 20, dpi = 600)
+              
+
+
+
+
+
 
 
 # /////////////////////// Matrices /////////////////////// # 
-
-
-
-
-
-
-
-
 
 
 # Loads the data ~
@@ -394,6 +510,12 @@ final_data <- list(cor_mat = cor_mat, mean_cors = mean_cors)
 # Merge the melted data frames
 cor_mat_df <- melt(final_data$cor_mat)
 mean_cors_df <- melt(final_data$mean_cors)
+
+# Assuming your data frame is called df
+cor_mat_df <- mutate(cor_mat_df, K = 2)
+
+# If you want to specify the number of rows to repeat the value
+cor_mat_df <- mutate(cor_mat_df, K = rep(2, nrow(cor_mat_df)))
 
 
 cor_mat_df$value[cor_mat_df$value == 10] <- 0
