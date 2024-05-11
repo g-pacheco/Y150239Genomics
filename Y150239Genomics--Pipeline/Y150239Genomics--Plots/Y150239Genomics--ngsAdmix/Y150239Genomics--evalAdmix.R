@@ -151,20 +151,26 @@ fulldf_ind <- fulldf_ind %>%
 fulldf_ind <- replace(fulldf_ind, is.na(fulldf_ind), 10)
 
 
+# Filters df for unique combinations and not self-combinations ~
+fulldf_ind <- fulldf_ind %>%
+              group_by(CHRType, K) %>%
+              mutate(combination_sorted = paste(sort(c(Ind_1, Ind_2)), collapse = "_")) %>%
+              filter(Ind_1 <= Ind_2) %>%
+              select(-combination_sorted) %>%
+              filter(Ind_1 != Ind_2) %>%
+              ungroup()
 
-fulldf_ind_less <- fulldf_ind %>%
-              rowwise() %>%
-              mutate(combination = paste(sort(c(Ind_1, Ind_2)), collapse = "_")) %>%
-              distinct(combination, .keep_all = TRUE) %>%
-              select(-combination)
+              
+# Corrects Population names ~
+levels(fulldf_ind$Ind_1 <- sub("Y150239_01", "Y150239", fulldf_ind$Ind_1))
+levels(fulldf_ind$Ind_2 <- sub("Y150239_01", "Y150239", fulldf_ind$Ind_2))
 
 
-fulldf_ind_less2 <- fulldf_ind %>%
-                    mutate(Ind_1 = as.character(Ind_1),
-                    Ind_2 = as.character(Ind_2),
-                    sorted_pair = ifelse(Ind_1 < Ind_2, paste0(Ind_1, Ind_2), paste0(Ind_2, Ind_1))) %>%
-                    distinct(sorted_pair, .keep_all = TRUE) %>%
-                    select(-sorted_pair)
+# Reorders df based on Populations ~
+fulldf_ind <- fulldf_ind %>%
+              group_by(CHRType, K) %>%
+              arrange(Population_1, Population_2) %>%
+              ungroup()
 
 
 # Defines colour palette ~
@@ -201,8 +207,8 @@ CareBears <-
   geom_tile(colour = "#000000") +
   scale_fill_continuous(low = "#ffffff", high = "#f768a1") +
   scale_x_discrete(expand = c(0, 0)) +
-  scale_y_discrete(expand = c(0, 0)) +
-  facet_grid(K ~ CHRType) +
+  scale_y_discrete(limits = rev, expand = c(0, 0)) +
+  facet_grid(K ~ CHRType, scales = "free", space = "free") +
   theme(panel.background = element_rect(fill = "#ffffff"),
         panel.border = element_blank(),
         panel.grid.major = element_blank(),
@@ -218,7 +224,7 @@ CareBears <-
         axis.text.x = element_text(color = "#000000", size = 8.25, face = "bold", angle = 45, vjust = 1, hjust = 1),
         axis.text.y = element_text(color = "#000000", size = 8.25, face = "bold"),
         axis.ticks = element_line(color = "#000000", linewidth = .3),
-        strip.text = element_text(colour = "#000000", size = 14, face = "bold", family = "Optima"),
+        strip.text = element_text(colour = "#000000", size = 22, face = "bold", family = "Optima"),
         strip.background = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
         axis.line = element_line(colour = "#000000", linewidth = .3)) +
   guides(fill = guide_legend(title = "", title.theme = element_text(size = 16, face = "bold"),
