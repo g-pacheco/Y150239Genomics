@@ -173,31 +173,20 @@ fulldf_ind <- fulldf_ind %>%
               ungroup()
 
 
-# Defines colour palette ~
+# Define color palette and breaks
 color_palette <- c("#001260", "#EAEDE9", "#601200")
-
-
-# Make sure col palette is centered on 0 ~
-Min <- -0.1
-Max <- 0.1
+nHalf <- 4
+Min <- -.1
+Max <- .1
 Thresh <- 0
-nHalf <- 10
 
-# Defines the breaks ~
+rc1 <- colorRampPalette(colors = color_palette[1:2], space = "Lab")(nHalf)
+rc2 <- colorRampPalette(colors = color_palette[2:3], space = "Lab")(nHalf)
+rampcols <- c(rc1, rc2)
+rampcols[c(nHalf, nHalf+1)] <- rgb(t(col2rgb(color_palette[2])), maxColorValue = 256) 
+
 rb1 <- seq(Min, Thresh, length.out = nHalf + 1)
 rb2 <- seq(Thresh, Max, length.out = nHalf + 1)[-1]
-breaks <- c(rb1, rb2)
-
-## Make vector of colors for values below threshold
-rc1 <- colorRampPalette(colors = color_palette[1:2], space = "Lab")(nHalf)
-
-## Make vector of colors for values above threshold
-rc2 <- colorRampPalette(colors = color_palette[2:3], space="Lab")(nHalf)
-rampcols <- c(rc1, rc2)
-
-
-rb1 <- seq(Min, Thresh, length.out=nHalf+1)
-rb2 <- seq(Thresh, Max, length.out=nHalf+1)[-1]
 rampbreaks <- c(rb1, rb2)
 
 
@@ -205,7 +194,8 @@ rampbreaks <- c(rb1, rb2)
 CareBears <-
   ggplot(fulldf_ind, aes(Ind_1, Ind_2, fill = as.numeric(Value))) + 
   geom_tile(colour = "#000000") +
-  scale_fill_continuous(low = "#ffffff", high = "#f768a1") +
+  scale_fill_gradientn(colors = rampcols, breaks = rampbreaks, limits = c(-.1, .1)) +
+  geom_tile(data = subset(fulldf_ind, Value == 10), aes(fill = "black")) +
   scale_x_discrete(expand = c(0, 0)) +
   scale_y_discrete(limits = rev, expand = c(0, 0)) +
   facet_grid(K ~ CHRType, scales = "free", space = "free") +
@@ -348,7 +338,7 @@ min_z <- z_lims[1]
 max_z <- z_lims[2]
 
 diag(cor_mat) <- 10
-nHalf <- 10
+nHalf <- 5
 
 # make sure col palette is centered on 0
 Min <- min_z
@@ -594,8 +584,45 @@ plotCorRes(cor_mat = Corres_2, pop = as.vector(ids[, 2]), ord = NULL,
            title = "Evaluation of 1000G admixture proportions with K = 2", max_z = .1, min_z = -.1)
 
 
-plotCorRes(cor_mat = Corres_3, pop = as.vector(ids[, 1]), ord = NULL,
-           title = "Evaluation of 1000G admixture proportions with K = 3", max_z = .1, min_z = -.1)
+Corres_2 <- as.matrix(read.table("AllSamples_bcftools.raw.vcf.Filtered.Autosomes.NoKinship.NoTreeSparrow.MAFfiltered.Pruned.K2.corres"))
+
+
+# Reads the annotation file ~
+ids <- read.table("AllSamples_bcftools.raw.vcf.Filtered.Autosomes.NoKinship.NoTreeSparrow.MAFfiltered.Pruned.K2.labels", stringsAsFactors = FALSE, sep = "\t", header = FALSE)
+
+
+# Adds column ids names ~
+colnames(ids) <- c("Sample_ID")
+
+
+# Expands ids by adding Population ~
+ids$Population <- ifelse(grepl("FR0", ids$Sample_ID), "Sales",
+                         ifelse(grepl("KAZ", ids$Sample_ID), "Chokpak",
+                                ifelse(grepl("Lesina", ids$Sample_ID), "Lesina",
+                                       ifelse(grepl("Crotone", ids$Sample_ID), "Crotone",
+                                              ifelse(grepl("Guglionesi", ids$Sample_ID), "Guglionesi",
+                                                     ifelse(grepl("PI22NLD0001M", ids$Sample_ID), "Y150239",
+                                                            ifelse(grepl("PD22NLD0146F", ids$Sample_ID), "Garderen",
+                                                                   ifelse(grepl("PD22NLD0147F", ids$Sample_ID), "Garderen",
+                                                                          ifelse(grepl("PDOM2022NLD0077M", ids$Sample_ID), "Meerkerk",
+                                                                                 ifelse(grepl("PDOM2022NLD0", ids$Sample_ID), "Utrecht", "Error"))))))))))
+
+
+# Reorders Population ~
+ids$Population <- factor(ids$Population, ordered = T,
+                         levels = c("Utrecht",
+                                    "Garderen",
+                                    "Meerkerk",
+                                    "Sales",
+                                    "Crotone",
+                                    "Guglionesi",
+                                    "Lesina",
+                                    "Chokpak",
+                                    "Y150239"))
+
+
+plotCorRes(cor_mat = Corres_2, pop = as.vector(ids[, 1]), ord = NULL,
+           title = "Evaluation of 1000G admixture proportions with K = 2", max_z = .1, min_z = -.1)
 plotCorRes(cor_mat = Corres_4, pop = as.vector(ids[, 1]), ord = NULL,
            title = "Evaluation of 1000G admixture proportions with K = 4", max_z = .1, min_z = -.1)
 plotCorRes(cor_mat = Corres_5, pop = as.vector(ids[, 1]), ord = NULL,
