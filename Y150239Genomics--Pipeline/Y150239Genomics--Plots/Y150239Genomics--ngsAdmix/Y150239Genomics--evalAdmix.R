@@ -25,20 +25,26 @@ for (k in seq_along(annot_files)) {
   annot[[k]] <- read.table(annot_files[k], sep = "\t", header = FALSE, stringsAsFactors = FALSE)
   colnames(annot[[k]]) <- c("Annot")
   annot[[k]]$Population_1 <- ifelse(grepl("FR0", annot[[k]]$Annot), "Sales",
-                           ifelse(grepl("KAZ", annot[[k]]$Annot), "Chokpak",
-                           ifelse(grepl("Lesina", annot[[k]]$Annot), "Lesina",
-                           ifelse(grepl("Crotone", annot[[k]]$Annot), "Crotone",
-                           ifelse(grepl("Guglionesi", annot[[k]]$Annot), "Guglionesi",
-                           ifelse(grepl("PI22NLD0001M", annot[[k]]$Annot), "Y150239",
-                           ifelse(grepl("PD22NLD0146F", annot[[k]]$Annot), "Garderen",
-                           ifelse(grepl("PD22NLD0147F", annot[[k]]$Annot), "Garderen",
-                           ifelse(grepl("PDOM2022NLD0077M", annot[[k]]$Annot), "Meerkerk",
-                           ifelse(grepl("PDOM2022NLD0", annot[[k]]$Annot), "Utrecht", "Error"))))))))))
+                             ifelse(grepl("KAZ", annot[[k]]$Annot), "Chokpak",
+                             ifelse(grepl("Lesina", annot[[k]]$Annot), "Lesina",
+                             ifelse(grepl("Crotone", annot[[k]]$Annot), "Crotone",
+                             ifelse(grepl("Guglionesi", annot[[k]]$Annot), "Guglionesi",
+                             ifelse(grepl("PI22NLD0001M", annot[[k]]$Annot), "Y150239",
+                             ifelse(grepl("PD22NLD0146F", annot[[k]]$Annot), "Garderen",
+                             ifelse(grepl("PD22NLD0147F", annot[[k]]$Annot), "Garderen",
+                             ifelse(grepl("PDOM2022NLD0077M", annot[[k]]$Annot), "Meerkerk",
+                             ifelse(grepl("PDOM2022NLD0", annot[[k]]$Annot), "Utrecht", "Error"))))))))))
   corres_df <- as.data.frame(read.table(corres_files[k]))
   rownames(corres_df) <- annot[[k]]$Annot
   colnames(corres_df) <- annot[[k]]$Annot
   corres_df$CHRType <- str_extract(corres_files[k], "(Allosome|Autosomes)")
   corres_df$K <- str_extract(corres_files[k], "(K2|K3|K4|K5|K6|K7)")
+  corres_df$K <- ifelse(grepl("K2", corres_df$K), "K = 2",
+                 ifelse(grepl("K3", corres_df$K), "K = 3",
+                 ifelse(grepl("K4", corres_df$K), "K = 4",
+                 ifelse(grepl("K5", corres_df$K), "K = 5",
+                 ifelse(grepl("K6", corres_df$K), "K = 6",
+                 ifelse(grepl("K7", corres_df$K), "K = 7", "Error"))))))
   corres[[k]] <- corres_df}
 
 
@@ -109,7 +115,7 @@ fulldf_ind <- fulldf_ind %>%
 
 # Gets Indexes_1 ~
 Indexes_1 <- fulldf_ind %>%
-  filter(CHRType == "Allosome" & K == "K2") %>%
+  filter(CHRType == "Allosome" & K == "K = 2") %>%
   group_by(Population_1, Sample_ID_1) %>%
   mutate(first_occurrence = row_number() == 1) %>%
   filter(first_occurrence == TRUE) %>%
@@ -126,7 +132,7 @@ fulldf_ind <- merge(fulldf_ind, Indexes_1, by.x = "Sample_ID_1" , all.x = TRUE)
 
 # Gets Indexes_2 ~
 Indexes_2 <- fulldf_ind %>%
-  filter(CHRType == "Allosome" & K == "K2") %>%
+  filter(CHRType == "Allosome" & K == "K = 2") %>%
   group_by(Population_2, Sample_ID_2) %>%
   mutate(first_occurrence = row_number() == 1) %>%
   filter(first_occurrence == TRUE) %>%
@@ -173,6 +179,22 @@ fulldf_ind <- fulldf_ind %>%
               ungroup()
 
 
+# Reorders CHRType ~
+fulldf_ind$CHRType <- factor(fulldf_ind$CHRType, ordered = T,
+                             levels = c("Autosomes",
+                                        "Allosome"))
+
+
+# Reorders K ~
+fulldf_ind$K <- factor(fulldf_ind$K, ordered = T,
+                       levels = c("K = 7",
+                                  "K = 6", 
+                                  "K = 5",
+                                  "K = 4",
+                                  "K = 3",
+                                  "K = 2"))
+
+
 # Define color palette and breaks
 color_palette <- c("#001260", "#EAEDE9", "#601200")
 nHalf <- 4
@@ -214,7 +236,7 @@ CareBears <-
         axis.text.x = element_text(color = "#000000", size = 8.25, face = "bold", angle = 45, vjust = 1, hjust = 1),
         axis.text.y = element_text(color = "#000000", size = 8.25, face = "bold"),
         axis.ticks = element_line(color = "#000000", linewidth = .3),
-        strip.text = element_text(colour = "#000000", size = 22, face = "bold", family = "Optima"),
+        strip.text = element_text(colour = "#000000", size = 24, face = "bold", family = "Optima"),
         strip.background = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
         axis.line = element_line(colour = "#000000", linewidth = .3)) +
   guides(fill = guide_legend(title = "", title.theme = element_text(size = 16, face = "bold"),
@@ -222,7 +244,7 @@ CareBears <-
 
 
 # Saves plot (Boxplot) ~
-ggsave(CareBears, file = "CareBears.pdf",
+ggsave(CareBears, file = "CareBears_C.pdf",
        device = cairo_pdf, limitsize = FALSE, scale = 1, width = 30, height = 50, dpi = 600)
 ggsave(CareBears, file = "CareBears.png",
        limitsize = FALSE, scale = 1, width = 20, height = 20, dpi = 600)
