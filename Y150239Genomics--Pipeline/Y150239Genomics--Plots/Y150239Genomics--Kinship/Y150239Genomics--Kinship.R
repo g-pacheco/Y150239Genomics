@@ -138,7 +138,7 @@ Kinship_Plot_Boxplot <-
 
 
 # Saves plot (Boxplot) ~
-ggsave(Kinship_Plot_Boxplot, file = "Y150239Genomics--Kinship_Boxplot_AutosomesOnly.pdf",
+ggsave(Kinship_Plot_Boxplot, file = "Y150239Genomics--Kinship_Boxplot.pdf",
        device = cairo_pdf, limitsize = FALSE, scale = 1, width = 8, height = 5, dpi = 600)
 ggsave(Kinship_Plot_Boxplot, file = "Y150239Genomics--Kinship_Boxplot_AutosomesOnly.jpeg",
        limitsize = FALSE, scale = 1, width = 8, height = 5, dpi = 600)

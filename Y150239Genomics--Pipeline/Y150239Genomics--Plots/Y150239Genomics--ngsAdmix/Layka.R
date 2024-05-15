@@ -74,8 +74,8 @@ compute_on_matrices <- function(corres_ind_list, pop_list, ord_list) {
 
 # Applies functions ~
 main_list <- compute_on_matrices(corres_ind_list = corres,
-                                     pop_list = lapply(annot, function(ann) ann$Population),
-                                     ord_list = lapply(corres, orderInds))
+                                 pop_list = lapply(annot, function(ann) ann$Population),
+                                 ord_list = lapply(corres, orderInds))
 
 
 
