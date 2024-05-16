@@ -26,7 +26,7 @@ samples.allo <- read.table("Y150239Genomics--ngsAdmix.Allosome.popfile", strings
 
 
 # Reads the annotation file ~
-ids <- read.table("Y150239Genomics--ngsAdmix.labels", stringsAsFactors = FALSE, sep = "\t", header = FALSE)
+ids <- read.table("AllSamples_bcftools.raw.vcf.Filtered.Allosome.NoKinship.NoTreeSparrow.MAFfiltered.Pruned.K2.labels", stringsAsFactors = FALSE, sep = "\t", header = FALSE)
 
 
 # Adds column ids names ~
@@ -168,7 +168,7 @@ ggplot(fulldf, aes(x = Sample_ID, y = Ancestry, fill = K)) +
 
 
 # Saves the final plot ~
-ggsave(ngsAdmix, file = "XXX.pdf",
+ggsave(ngsAdmix, file = "Homeros.pdf",
        device = cairo_pdf, width = 20, height = 12, dpi = 600)
 
 
