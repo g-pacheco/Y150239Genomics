@@ -167,13 +167,6 @@ ggplot(fulldf, aes(x = Sample_ID, y = Ancestry, fill = K)) +
         strip.text.y = element_text(family = "Optima", colour = "#000000", face = "bold", size = 14, angle = 90, margin = margin(0, .1, 0, .1, "cm")))
 
 
-# Saves the final plot ~
-#ggsave(ngsAdmix, file = "Y150239Genomics--ngsAdmix.pdf",
-#       device = cairo_pdf, width = 20, height = 12, dpi = 600)
-#ggsave(ngsAdmix, file = "Y150239Genomics--ngsAdmix.jpeg",
-#       width = 20, height = 12, dpi = 600)
-
-
 # Adds grob ~
 ngsAdmix_G <- ggplotGrob(ngsAdmix)
 ngsAdmix_G <- gtable_add_rows(ngsAdmix_G, unit(1.25, "cm"), pos = 5)
@@ -201,9 +194,9 @@ grid.draw(ngsAdmix_G)
 
 
 # Saves the final plot ~
-ggsave(ngsAdmix_G, file = "Y150239Genomics--ngsAdmix_Article.pdf",
+ggsave(ngsAdmix_G, file = "Y150239Genomics--ngsAdmix.pdf",
        device = cairo_pdf, width = 20, height = 12, scale = 1, dpi = 600)
-ggsave(ngsAdmix_G, file = "Y150239Genomics--ngsAdmix_Article.png",
+ggsave(ngsAdmix_G, file = "Y150239Genomics--ngsAdmix.png",
        width = 20, height = 12, scale = 1, dpi = 600)
 
 
