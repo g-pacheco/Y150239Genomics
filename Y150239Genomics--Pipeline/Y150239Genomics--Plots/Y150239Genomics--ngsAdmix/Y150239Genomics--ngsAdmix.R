@@ -78,7 +78,7 @@ ids$Species <- factor(ids$Species, ordered = T,
 ids.auto <- ids
 ids.allo <- ids
 ids.auto$chrtype <- "Autosomes"
-ids.allo$chrtype <- "Allosome"
+ids.allo$chrtype <- "Chromosome Z"
 
 
 # Creates data frame ~
@@ -134,7 +134,7 @@ fulldf <- rbind(fulldf.auto, fulldf.allo)
 # Reorders chrtye ~
 fulldf$chrtype <- factor(fulldf$chrtype, ordered = T,
                         levels = c("Autosomes",
-                                    "Allosome"))
+                                   "Chromosome Z"))
 
 
 # Defines the target to be plotted ~
@@ -163,13 +163,15 @@ ggplot(fulldf, aes(x = Sample_ID, y = Ancestry, fill = K)) +
         axis.text.x.bottom = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks = element_blank(),
-        strip.text.x = element_text(colour = "#000000", face = "bold", family = "Optima", size = 14, angle = 90, margin = margin(.5, .1, .5, .1, "cm")),
-        strip.text.y = element_text(colour = "#000000", face = "bold", family = "Optima", size = 14, angle = 90, margin = margin(0, .1, 0, .1, "cm")))
+        strip.text.x = element_text(family = "Optima", colour = "#000000", face = "bold", size = 14, angle = 90, margin = margin(.5, .1, .5, .1, "cm")),
+        strip.text.y = element_text(family = "Optima", colour = "#000000", face = "bold", size = 14, angle = 90, margin = margin(0, .1, 0, .1, "cm")))
 
 
 # Saves the final plot ~
-ggsave(ngsAdmix, file = "Homeros.pdf",
-       device = cairo_pdf, width = 20, height = 12, dpi = 600)
+#ggsave(ngsAdmix, file = "Y150239Genomics--ngsAdmix.pdf",
+#       device = cairo_pdf, width = 20, height = 12, dpi = 600)
+#ggsave(ngsAdmix, file = "Y150239Genomics--ngsAdmix.jpeg",
+#       width = 20, height = 12, dpi = 600)
 
 
 # Adds grob ~
@@ -179,14 +181,14 @@ ngsAdmix_G <- gtable_add_rows(ngsAdmix_G, unit(1.25, "cm"), pos = 5)
 
 # Adds top strips ~
 ngsAdmix_G <- gtable_add_grob(ngsAdmix_G, list(rectGrob(gp = gpar(col = "#000000", fill = "#1E90FF", alpha = .7, size = .75, lwd = .25)),
-               textGrob("HOUSE", gp = gpar(cex = 1.5, fontface = 'bold', fontfamily = "Optima", col = "black"))),
-               t = 6, l = 4, b = 6, r = 9, name = c("a", "b"))
+               textGrob("House Sparrow", gp = gpar(cex = 1.5, fontface = 'bold', fontfamily = "Optima", col = "black"))),
+               t = 6, l = 4, b = 6, r = 20, name = c("a", "b"))
 ngsAdmix_G <- gtable_add_grob(ngsAdmix_G, list(rectGrob(gp = gpar(col = "#000000", fill = "#FFD700", alpha = .7, size = .5, lwd = .25)),
-               textGrob("ITALIAN", gp = gpar(cex = 1.5, fontface = 'bold', fontfamily = "Optima", col = "black"))),
-               t = 6, l = 11, b = 6, r = 13, name = c("a", "b"))
+               textGrob("Italian Sparrow", gp = gpar(cex = 1.5, fontface = 'bold', fontfamily = "Optima", col = "black"))),
+               t = 6, l = 22, b = 6, r = 28, name = c("a", "b"))
 ngsAdmix_G <- gtable_add_grob(ngsAdmix_G, list(rectGrob(gp = gpar(col = "#000000", fill = "#ee0000", alpha = .7, size = .75, lwd = .25)),
-               textGrob("SPANISH", gp = gpar(cex = 1.5, fontface = 'bold', fontfamily = "Optima", col = "black"))),
-               t = 6, l = 15, b = 6, r = 17, name = c("a", "b"))
+               textGrob("Spanish Sparrow", gp = gpar(cex = 1.5, fontface = 'bold', fontfamily = "Optima", col = "black"))),
+               t = 6, l = 30, b = 6, r = 36, name = c("a", "b"))
 
 
 # Controls separation ~
@@ -199,19 +201,15 @@ grid.draw(ngsAdmix_G)
 
 
 # Saves the final plot ~
-ggsave(ngsAdmix_G, file = "Leiden_Admix.pdf",
-       device = cairo_pdf, width = 30, height = 12, scale = 1, dpi = 600)
-ggsave(ngsAdmix_G, file = "Leiden_Admix.jpeg",
-       width = 30, height = 12, scale = 1, dpi = 600)
+ggsave(ngsAdmix_G, file = "Y150239Genomics--ngsAdmix_Article.pdf",
+       device = cairo_pdf, width = 20, height = 12, scale = 1, dpi = 600)
+ggsave(ngsAdmix_G, file = "Y150239Genomics--ngsAdmix_Article.png",
+       width = 20, height = 12, scale = 1, dpi = 600)
 
 
 #
 ##
 ### The END ~~~~~
-
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 #c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20),

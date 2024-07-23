@@ -353,6 +353,11 @@ fit_data$CHRType <- str_extract(fit_data$File, "(Allosome|Autosomes)")
 ld_data$CHRType <- str_extract(ld_data$File, "(Allosome|Autosomes)")
 
 
+# Corrects Population names ~
+levels(fit_data$CHRType <- sub("Allosome", "Chromossome Z", fit_data$CHRType))
+levels(ld_data$CHRType <- sub("Allosome", "Chromossome Z", ld_data$CHRType))
+
+
 # Expands fit_data & ld_data by adding a PruningState column ~
 fit_data$PruningState <- ifelse(grepl("Pruned", fit_data$File), "Pruned", "Not Pruned")
 ld_data$PruningState <- ifelse(grepl("Pruned", ld_data$File), "Pruned", "Not Pruned")
@@ -360,9 +365,9 @@ ld_data$PruningState <- ifelse(grepl("Pruned", ld_data$File), "Pruned", "Not Pru
 
 # Reorders CHRType ~
 fit_data$CHRType <- factor(fit_data$CHRType, ordered = TRUE,
-                        levels = c("Autosomes", "Allosome"))
+                        levels = c("Autosomes", "Chromossome Z"))
 ld_data$CHRType <- factor(ld_data$CHRType, ordered = TRUE,
-                       levels = c("Autosomes", "Allosome"))
+                       levels = c("Autosomes", "Chromossome Z"))
 
 
 # Reorders PruningState ~
@@ -462,23 +467,20 @@ plot <- plot +
           panel.border = element_blank(),
           panel.grid.major = element_line(color = "#E5E7E9", linetype = "dashed", linewidth = .005),
           panel.grid.minor = element_blank(),
-          axis.title.x = element_text(size = 13, face = "bold", color = "#000000", margin = margin(t = 20, r = 0, b = 0, l = 0)),
-          axis.title.y = element_text(size = 13, face = "bold", color = "#000000", margin = margin(t = 0, r = 20, b = 0, l = 0)),
-          axis.text = element_text(color = "#000000", size = 8, face = "bold"),
+          axis.title.x = element_text(family = "Optima", size = 13, face = "bold", color = "#000000", margin = margin(t = 20, r = 0, b = 0, l = 0)), 
+          axis.title.y = element_text(family = "Optima", size = 13, face = "bold", color = "#000000", margin = margin(t = 0, r = 20, b = 0, l = 0)),
+          axis.text = element_text(family = "Optima", color = "#000000", size = 8, face = "bold"),
           axis.line = element_line(colour = "#000000", linewidth = .3),
           axis.ticks = element_line(color = "#000000", linewidth = .3),
           strip.background = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
-          strip.text = element_text(colour = "#000000", size = 11, face = "bold", family = "Optima"),
+          strip.text = element_text(family = "Optima", colour = "#000000", size = 13, face = "bold"),
           legend.position = "none",
           legend.background = element_blank(),
           legend.key = element_blank(),
           legend.spacing.y = unit(.4, "cm"),
           legend.key.height = unit(.45, "cm"),
           legend.margin = margin(t = 0, b = 0, r = 0, l = 0),
-          legend.box.margin = margin(t = 5, b = -20, r = 0, l = 30)) +
-    guides(colour = guide_legend(title = "LD State:", title.theme = element_text(size = 12, face = "bold"),
-                                 label.theme = element_text(size = 10),
-                                 override.aes = list(size = 3, alpha = .9, starstroke = .15)))
+          legend.box.margin = margin(t = 5, b = -20, r = 0, l = 30))
   
   
 # If plotting, apart from linetypes, also shapes (for B/W or color-blind printing) ~
@@ -513,7 +515,7 @@ if(n_groups < 2 || opt$plot_no_legend) {
 
 
 # Saves plot ~
-ggsave(plot = plot, file = "Y150239Genomics--LD_Median.pdf",
+ggsave(plot = plot, file = "Y150239Genomics--LD_Median_Article.pdf",
        device = cairo_pdf, scale = 1, width = 12, height = 8, dpi = 600, limitsize = FALSE)
 ggsave(plot = plot, file = "Y150239Genomics--LD_Median.png",
        scale = 1, width = 12, height = 8, dpi = 600, limitsize = FALSE)

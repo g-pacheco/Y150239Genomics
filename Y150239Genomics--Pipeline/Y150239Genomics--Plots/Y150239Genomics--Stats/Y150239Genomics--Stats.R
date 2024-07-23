@@ -94,6 +94,10 @@ fulldfUp$Stat <- factor(fulldfUp$Stat, ordered = T,
                                    "total_reads"))
 
 
+fulldfUp %>% filter(Stat == "hits_coverage") %>%
+             summarise(mean(Value))
+
+
 # Corrects facet labels ~
 ylabels <- c("total_reads" = "# of Reads",
              "reads_adaptors" = "% of Reads With Adaptors",
@@ -143,12 +147,8 @@ labels_fun <- function(z) {
 # Creates the panel ~
 Y150239Genomics_Stat <- 
  ggplot() +
-  #geom_violin(data = fulldfUp, aes(x = Population, y = Value),
-  #            fill = "#ffffff", colour = "#000000", show.legend = FALSE, alpha = .9, size = .45, width = 1) +
   geom_boxplot(data = fulldfUp, aes(x = Population, y = Value),
                outlier.shape = NA, width = .5, lwd = .25, colour = "#000000", fill = "#C19EBE", alpha = .7) +
-  #stat_summary(data = fulldfUp, aes(x = Population, y = Value),  
-  #             fun = mean, geom = "point", shape = 21, size = 2.5, alpha = 1, colour = "#000000", fill = "#df65b0") +
   facet_rep_grid(Stat ~. , scales = "free", labeller = labeller(Stat = ylabels)) +
   scale_y_continuous(#limits = limits_fun,
                      #breaks = breaks_fun,
@@ -160,11 +160,11 @@ Y150239Genomics_Stat <-
         panel.spacing.y = unit(1, "cm"),
         axis.line = element_line(colour = "#000000", linewidth = .3),
         axis.title = element_blank(),
-        axis.text.x = element_text(colour = "#000000", size = 10, face = "bold", angle = 45, vjust = 1, hjust = 1),
-        axis.text.y = element_text(color = "#000000", size = 8, face = "bold"),
+        axis.text.x = element_text(family = "Optima", colour = "#000000", size = 10, face = "bold", angle = 45, vjust = 1, hjust = 1),
+        axis.text.y = element_text(family = "Optima", color = "#000000", size = 8, face = "bold"),
         axis.ticks.x = element_line(color = "#000000", linewidth = .3),
         axis.ticks.y = element_line(color = "#000000", linewidth = .3),
-        strip.text = element_text(colour = "#000000", family = "Optima", size = 8.85, face = "bold"),
+        strip.text = element_text(family = "Optima", colour = "#000000", size = 9, face = "bold"),
         strip.background.y = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
         legend.position = "top",
         legend.margin = margin(t = 0, b = 0, r = 0, l = 0),
@@ -174,10 +174,10 @@ Y150239Genomics_Stat <-
 
 
 # Saves the panel ~
-ggsave(Y150239Genomics_Stat, file = "Y150239Genomics--Stats.pdf",
-       device = cairo_pdf, width = 12, height = 16, scale = 1, dpi = 600)
-ggsave(Y150239Genomics_Stat, file = "Y150239Genomics--Stats.jpeg",
-       width = 12, height = 16, scale = 1, dpi = 600)
+ggsave(Y150239Genomics_Stat, file = "Y150239Genomics--Stats_Article.pdf",
+       device = cairo_pdf, width = 12, height = 17, scale = 1, dpi = 600)
+ggsave(Y150239Genomics_Stat, file = "Y150239Genomics--Stats_Article.png",
+       width = 12, height = 17, scale = 1, dpi = 600)
 
 
 #

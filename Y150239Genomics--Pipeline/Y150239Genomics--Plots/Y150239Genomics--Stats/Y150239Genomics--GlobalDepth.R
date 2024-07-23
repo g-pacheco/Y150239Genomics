@@ -12,11 +12,7 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 
 # Loads required packages ~
-pacman::p_load(scales, extrafont, tidyverse, reshape2, lemon)
-
-
-# Imports extra fonts ~
-font_import()
+pacman::p_load(tidyverse, lemon)
 
 
 # Loads data ~
@@ -25,14 +21,14 @@ fulldf$Type <- ""
 
 
 # Expands fulldf by adding chrtype ~
-fulldf$chrtype <- ifelse(grepl("chrZ", fulldf$CHROM), "Allosome (Z)",
+fulldf$chrtype <- ifelse(grepl("chrZ", fulldf$CHROM), "Chromosome Z",
                   ifelse(grepl("mtDNA", fulldf$CHROM), "mtGenome", "Autosomes"))
 
 
 # Reorders chrtype ~
 fulldf$chrtype <- factor(fulldf$chrtype, ordered = T,
                          levels = c("Autosomes",
-                                    "Allosome (Z)",
+                                    "Chromosome Z",
                                     "mtGenome"))
 
 
@@ -44,7 +40,7 @@ quantiles_df <- fulldf %>%
 
 # Expands quantiles_df by adding annotation ~
 quantiles_df <- quantiles_df %>%
-  add_column(group = c("Autosomes", "Allosome (Z)", "mtGenome")) %>%
+  add_column(group = c("Autosomes", "Chromosome Z", "mtGenome")) %>%
   add_column(label = c(sprintf("Quantile 95%%: %.0fX", quantiles_df$x_quantile))) %>%
   add_column(value_x = c(62.5, 62.5, 62.5)) %>%
   add_column(v_just = c(2.14, 2.3, 2.95)) %>%
@@ -96,11 +92,11 @@ GlobalCoverage <-
         panel.grid.minor = element_blank(), 
         panel.border = element_blank(),
         panel.spacing.y = unit(1, "cm"),
-        axis.title.x = element_text(size = 16, face = "bold", color = "#000000", margin = margin(t = 25, r = 0, b = 0, l = 0)),
-        axis.title.y = element_text(size = 16, face = "bold", color = "#000000", margin = margin(t = 0, r = 25, b = 0, l = 0)),
+        axis.title.x = element_text(family = "Optima", size = 16, face = "bold", color = "#000000", margin = margin(t = 25, r = 0, b = 0, l = 0)),
+        axis.title.y = element_text(family = "Optima", size = 16, face = "bold", color = "#000000", margin = margin(t = 0, r = 25, b = 0, l = 0)),
         axis.ticks = element_line(linewidth = .3, color = "#000000"),
-        axis.text.x = element_text(size = 10, color = "#000000", face = "bold"),
-        axis.text.y = element_text(size = 10, color = "#000000", face = "bold"),
+        axis.text.x = element_text(family = "Optima", size = 10, color = "#000000", face = "bold"),
+        axis.text.y = element_text(family = "Optima", size = 10, color = "#000000", face = "bold"),
         strip.text = element_text(colour = "#000000", size = 13, face = "bold", family = "Optima"),
         strip.background.y = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
         axis.line = element_line(colour = "#000000", linewidth = .3),
@@ -108,14 +104,12 @@ GlobalCoverage <-
 
   
 # Saves plot ~
-ggsave(GlobalCoverage, file = "Y150239Genomics--MeanDepth.pdf",
-       width = 9, height = 9, scale = 1, device = cairo_pdf, dpi = 600)
-ggsave(GlobalCoverage, file = "Y150239Genomics--MeanDepth.jpg",
-       width = 9, height = 9, scale = 1, dpi = 600)
+ggsave(GlobalCoverage, file = "Y150239Genomics--MeanDepth_Article.pdf",
+       width = 12, height = 12, scale = 1, device = cairo_pdf, dpi = 600)
+ggsave(GlobalCoverage, file = "Y150239Genomics--MeanDepth_Article.jpg",
+       width = 12, height = 12, scale = 1, dpi = 600)
 
 
 #
 ##
 ### The END ~~~~~
-
-# angle = 45, vjust = 1, hjust = 1

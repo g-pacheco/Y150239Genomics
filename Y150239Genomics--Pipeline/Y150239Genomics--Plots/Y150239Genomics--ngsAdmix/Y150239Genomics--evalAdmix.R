@@ -15,15 +15,29 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 pacman::p_load(tidyverse, ggnewscale)
 source("visFuns.R")
 
+
 # Imports data while incorporating annotation ~
 corres <- list()
 annot <- list()
 corres_files <- dir(pattern = ".corres")
 annot_files <- dir(pattern = ".labels")
+Sample_Order <- c("Utrecht_01", "Utrecht_02", "Utrecht_03", "Utrecht_04", "Utrecht_05", "Utrecht_06", "Utrecht_07", "Utrecht_08", "Utrecht_09", "Utrecht_10",
+                  "Utrecht_11", "Utrecht_12", "Utrecht_13", "Utrecht_14", "Utrecht_15",
+                  "Garderen_01", "Garderen_02", "Meerkerk_01",
+                  "Sales_01", "Sales_02", "Sales_03", "Sales_04", "Sales_05", "Sales_06", "Sales_07", "Sales_08", "Sales_09", "Sales_10",
+                  "Crotone_01", "Crotone_02", "Crotone_03", "Crotone_04", "Crotone_05", "Crotone_06", "Crotone_07", "Crotone_08", "Crotone_09", "Crotone_10",
+                  "Guglionesi_01", "Guglionesi_02", "Guglionesi_03", "Guglionesi_04", "Guglionesi_05", "Guglionesi_06", "Guglionesi_07", "Guglionesi_08", "Guglionesi_09", "Guglionesi_10",
+                  "Lesina_01", "Lesina_02", "Lesina_03", "Lesina_04", "Lesina_05", "Lesina_06", "Lesina_07", "Lesina_08", "Lesina_09", "Lesina_10",
+                  "Chokpak_01", "Chokpak_02", "Chokpak_03", "Chokpak_04", "Chokpak_05", "Chokpak_06", "Chokpak_07", "Chokpak_08", "Chokpak_09", "Chokpak_10",
+                  "Y150239_01")
+
+# Remove suffixes from Sample_Order to get Pop_Order
+Pop_Order <- gsub("_\\d+$", "", Sample_Order)
+
 for (k in seq_along(annot_files)) {
   annot[[k]] <- read.table(annot_files[k], sep = "\t", header = FALSE, stringsAsFactors = FALSE)
   colnames(annot[[k]]) <- c("Annot")
-  annot[[k]]$Population_1 <- ifelse(grepl("FR0", annot[[k]]$Annot), "Sales",
+  annot[[k]]$Population <- ifelse(grepl("FR0", annot[[k]]$Annot), "Sales",
                              ifelse(grepl("KAZ", annot[[k]]$Annot), "Chokpak",
                              ifelse(grepl("Lesina", annot[[k]]$Annot), "Lesina",
                              ifelse(grepl("Crotone", annot[[k]]$Annot), "Crotone",
@@ -33,11 +47,28 @@ for (k in seq_along(annot_files)) {
                              ifelse(grepl("PD22NLD0147F", annot[[k]]$Annot), "Garderen",
                              ifelse(grepl("PDOM2022NLD0077M", annot[[k]]$Annot), "Meerkerk",
                              ifelse(grepl("PDOM2022NLD0", annot[[k]]$Annot), "Utrecht", "Error"))))))))))
-  annot[[k]] <- annot[[k]][order(annot[[k]]$Population_1), ]
-  annot[[k]]$Ind_1 <- with(annot[[k]], ave(Population_1, Population_1, FUN = function(x) sprintf("%s_%02d", x, seq_along(x))))
+  
+  
+  # Sort annot based on Population_1
+  #annot[[k]] <- annot[[k]][order(annot[[k]]$Population_1), ]
+  
+  # Create Ind_1 without duplicates or NA values
+  annot[[k]]$Ind <- with(annot[[k]], ave(Population, Population, FUN = function(x) sprintf("%s_%02d", x, seq_along(x))))
+  annot[[k]] <- annot[[k]][!duplicated(annot[[k]]$Ind) & !is.na(annot[[k]]$Ind), ]
+  
+  # Load the corresponding file
   corres_df <- as.data.frame(read.table(corres_files[k]))
-  rownames(corres_df) <- annot[[k]]$Ind_1
-  colnames(corres_df) <- annot[[k]]$Ind_1
+  
+  # Ensure rownames and colnames match Sample_Order
+  rownames(corres_df) <- annot[[k]]$Ind
+  colnames(corres_df) <- annot[[k]]$Ind
+  
+  # Order corres_df rows and columns according to Sample_Order
+  corres_df <- corres_df[match(Sample_Order, rownames(corres_df)), match(Sample_Order, colnames(corres_df))]
+  
+  # Remove rows and columns that are NA
+  corres_df <- corres_df[complete.cases(rownames(corres_df)), complete.cases(colnames(corres_df))]
+  
   corres_df$CHRType <- str_extract(corres_files[k], "(Allosome|Autosomes)")
   corres_df$K <- str_extract(corres_files[k], "(K2|K3|K4|K5|K6|K7)")
   corres_df$K <- ifelse(grepl("K2", corres_df$K), "K = 2",
@@ -50,33 +81,30 @@ for (k in seq_along(annot_files)) {
 
 
 # Defines compute_individual_correlations function ~
-compute_individual_correlations <- function(corres_ind_list, pop_list, ord_list) {
+compute_individual_correlations <- function(corres_ind_list, pop_vector, ord_list) {
   result <- lapply(1:length(corres_ind_list), function(i) {
     corres_ind <- corres_ind_list[[i]]
-    pop <- pop_list[[i]]
-    ord <- ord_list[[i]]
-    annotation_df <- data.frame(Sample_ID_1 = rownames(corres_ind), Population_1 = pop)
-    for (j in 1:length(pop)) {
-      pop_name <- pop[j]
-      if (pop_name %in% names(ord)) {
-        pop_ord <- ord[[pop_name]]
+    annotation_df <- data.frame(Sample_ID_1 = rownames(corres_ind), Population_1 = pop_vector)
+    for (pop_name in unique(pop_vector)) {
+      if (pop_name %in% names(ord_list[[i]])) {
+        pop_ord <- ord_list[[i]][[pop_name]]
         chr_type <- unique(pop_ord$CHRType)
         k_val <- unique(pop_ord$K)
-        annotation_df$CHRType[pop == pop_name] <- chr_type
-        annotation_df$K[pop == pop_name] <- k_val}}
+        annotation_df$CHRType[annotation_df$Population_1 == pop_name] <- chr_type
+        annotation_df$K[annotation_df$Population_1 == pop_name] <- k_val}}
     indiv_matrix <- cbind(annotation_df, corres_ind)
     return(indiv_matrix)})
   return(result)}
 
 
+# Prepare the ord_list
+ord_list <- lapply(corres, orderInds)
+
+
 # Applies compute_on_matrices function ~
 ind_list <- compute_individual_correlations(corres_ind_list = corres,
-                                            pop_list = lapply(annot, function(ann) ann$Population_1),
-                                            ord_list = lapply(corres, orderInds))
-
-
-# Defines vector of populations ~
-pop <- as.vector(annot[[1]]$Population_1)
+                                            pop_vector = Pop_Order,
+                                            ord_list = ord_list)
 
 
 # Defines compute_mean_correlations function ~
@@ -115,7 +143,7 @@ compute_mean_correlations <- function(cor_mat_list, pop) {
 
 
 # Applies compute_mean_correlation function ~
-final_list <- compute_mean_correlations(ind_list, pop)
+final_list <- compute_mean_correlations(ind_list, Pop_Order)
 
 
 # Convert all matrices to numeric type
@@ -166,10 +194,6 @@ levels(fulldf$Sample_ID_1 <- sub("Y150239_01", "Y150239", fulldf$Sample_ID_1))
 levels(fulldf$Sample_ID_2 <- sub("Y150239_01", "Y150239", fulldf$Sample_ID_2))
 
 
-# Converts NAs in diagonal into 10s ~
-#fulldf <- replace(fulldf_final, is.na(fulldf_final), 10)
-
-
 # Reorders CHRType ~
 fulldf$CHRType <- factor(fulldf$CHRType, ordered = TRUE,
                          levels = c("Autosomes",
@@ -186,20 +210,10 @@ fulldf$K <- factor(fulldf$K, ordered = TRUE,
                               "K = 2"))
 
 
-# Reorders K ~
-#fulldf$Population_2 <- factor(fulldf$Population_2, ordered = TRUE,
-#                              levels = c("Utrecht",
-#                                         "Garderen",
-#                                         "Meerkerk",
-#                                         "Sales",
-#                                         "Crotone",
-#                                        "Guglionesi",
-#                                        "Lesina",
-#                                        "Chokpak",
-#                                         "Y150239"))
+fulldf$Sample_ID_1 <- factor(fulldf$Sample_ID_1, levels = fulldf$Sample_ID_1)
+#fulldf$Sample_ID_2 <- factor(fulldf$Sample_ID_2, levels = fulldf$Sample_ID_2)
 
-
-# Define color palette and breaks
+# Defines color palette and breaks ~
 color_palette <- c("#023858", "#ffffff", "#a50f15")
 nHalf <- 4
 Min <- -.3
@@ -219,10 +233,10 @@ rampbreaks <- c(rb1, rb2)
 # Creates heatmap ~
 evalAdmix_Plot <- 
   ggplot(data = fulldf) +
-  geom_tile(aes(Sample_ID_1, Sample_ID_2, fill = as.numeric(Value)), linewidth = .15, colour = "#000000") +
+  geom_tile(aes(x = Sample_ID_1, y = Sample_ID_2, fill = as.numeric(Value)), linewidth = .15, colour = "#000000") +
   scale_fill_gradientn(colors = rampcols, na.value = "#d6d6d6", breaks = rampbreaks, limits = c(-.3, .3)) +
-  scale_x_discrete(limits = rev, expand = c(0, 0)) + 
-  scale_y_discrete(limits = rev, expand = c(0, 0)) +
+  scale_x_discrete(expand = c(0, 0)) + 
+  scale_y_discrete(expand = c(0, 0)) +
   facet_grid(K ~ CHRType, scales = "free", space = "free") +
   theme(panel.background = element_rect(fill = "#ffffff"),
         panel.border = element_blank(),
@@ -272,77 +286,12 @@ ids$Population <- ifelse(grepl("FR0", ids$Sample_ID), "Sales",
                   ifelse(grepl("PDOM2022NLD0077M", ids$Sample_ID), "Meerkerk",
                   ifelse(grepl("PDOM2022NLD0", ids$Sample_ID), "Utrecht", "Error"))))))))))
 
+quartz(width = 10, height = 10)
 
 plotCorRes(cor_mat = Corres_2, pop = as.vector(ids[, 2]), ord = NULL,
            title = "Evaluation of 1000G admixture proportions with K = 2", max_z = .3, min_z = -.3)
 
 
-quartz(width = 10, height = 10)
-
-
-
 #
 ##
 ### The END ~~~~~
-
-
-# Gets Indexes_1 ~
-Indexes_1 <- fulldf_final %>%
-  filter(CHRType == "Allosome" & K == "K = 2") %>%
-  group_by(Population_1, Sample_ID_1) %>%
-  mutate(first_occurrence = row_number() == 1) %>%
-  filter(first_occurrence == TRUE) %>%
-  group_by(Population_1) %>%
-  mutate(Ind_1 = paste0(Population_1, "_", sprintf("%02d", ave(seq_along(Population_1), Population_1, FUN = seq_along)))) %>%
-  select(Sample_ID_1, Ind_1) %>%
-  ungroup()
-Indexes_1 <- Indexes_1 %>%
-  select(-Population_1)
-
-
-# Gets Ind_1 ~
-fulldf_final <- merge(fulldf_final, Indexes_1, by.x = "Sample_ID_1" , all.x = TRUE)
-
-
-# Gets Indexes_2 ~
-Indexes_2 <- fulldf_final %>%
-  filter(CHRType == "Allosome" & K == "K = 2") %>%
-  group_by(Population_2, Sample_ID_2) %>%
-  mutate(first_occurrence = row_number() == 1) %>%
-  filter(first_occurrence == TRUE) %>%
-  group_by(Population_2) %>%
-  mutate(Ind_2 = paste0(Population_2, "_", sprintf("%02d", ave(seq_along(Population_2), Population_2, FUN = seq_along)))) %>%
-  select(Sample_ID_2, Ind_2) %>%
-  ungroup()
-Indexes_2 <- Indexes_2 %>%
-  select(-Population_2)
-
-
-# Gets Ind_2 ~
-fulldf_final <- merge(fulldf_final, Indexes_2, by.x = "Sample_ID_2" , all.x = TRUE)
-
-
-#fulldf <- fulldf %>%
-#          group_by(CHRType, K) %>%
-#         arrange(Ind_1, Ind_2)
-
-
-# Reorders Population_1 ~
-#fulldf$Ind_1 <- factor(fulldf$Ind_1, ordered = TRUE,
-#                       levels = c("Utrecht_01", "Utrecht_02", "Utrecht_03", "Utrecht_04", "Utrecht_05",
-#                                  "Utrecht_06", "Utrecht_07", "Utrecht_08", "Utrecht_09", "Utrecht_10",
-#"Utrecht_11", "Utrecht_12", "Utrecht_13", "Utrecht_14", "Utrecht_15",
-#"Garderen_01", "Garderen_02",
-#"Meerkerk_01",
-#"Sales_01", "Sales_02", "Sales_03", "Sales_04", "Sales_05", "Sales_06", "Sales_07", "Sales_08", "Sales_09", "Sales_10",
-#"Crotone_01", "Crotone_02", "Crotone_03", "Crotone_04", "Crotone_05", "Crotone_06", "Crotone_07", "Crotone_08",  "Crotone_09", "Crotone_10",
-#"Guglionesi_01", "Guglionesi_02", "Guglionesi_03", "Guglionesi_04", "Guglionesi_05", "Guglionesi_06", "Guglionesi_07", "Guglionesi_08", "Guglionesi_09", "Guglionesi_10",
-#"Lesina_01", "Lesina_02", "Lesina_03", "Lesina_04", "Lesina_05", "Lesina_06", "Lesina_07", "Lesina_08", "Lesina_09", "Lesina_10",
-#"Chokpak_01", "Chokpak_02", "Chokpak_03", "Chokpak_04", "Chokpak_05", "Chokpak_06", "Chokpak_07", "Chokpak_08", "Chokpak_09", "Chokpak_10",
-#"Y150239"))
-
-
-# Convert "Population_1" column to factor with specified levels
-#fulldf <- fulldf %>%
-#          mutate(Ind_1 = factor(Ind_1, levels = population_order)) %>%
-#          arrange(Ind_1)

@@ -83,21 +83,26 @@ Kinship_Plot_Heatmap <-
         legend.box = "vertical",
         legend.box.margin = margin(t = 20, b = 30, r = 0, l = 0),
         axis.title = element_blank(),
-        axis.text.x = element_text(color = "#000000", size = 8.25, face = "bold", angle = 45, vjust = 1, hjust = 1),
-        axis.text.y = element_text(color = "#000000", size = 8.25, face = "bold"),
+        axis.text.x = element_text(family = "Optima", color = "#000000", size = 8.25, face = "bold", angle = 45, vjust = 1, hjust = 1),
+        axis.text.y = element_text(family = "Optima", color = "#000000", size = 8.25, face = "bold"),
         axis.ticks = element_line(color = "#000000", linewidth = .3),
-        strip.text = element_text(colour = "#000000", size = 14, face = "bold", family = "Optima"),
+        strip.text = element_text(family = "Optima", colour = "#000000", size = 14, face = "bold"),
         strip.background = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
         axis.line = element_line(colour = "#000000", linewidth = .3)) +
-  guides(fill = guide_legend(title = "Rab", title.theme = element_text(size = 16, face = "bold"),
-                             label.theme = element_text(size = 15), reverse = TRUE))
+  guides(fill = guide_legend(title = "Rab", title.theme = element_text(family = "Optima", size = 16, face = "bold"),
+                             label.theme = element_text(family = "Optima", size = 15), reverse = TRUE))
 
 
 # Saves plot (Heatmap) ~
-ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship_Heatmap_AutosomesOnly.pdf",
+ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship_Article.pdf",
        device = cairo_pdf, limitsize = FALSE, scale = 1, width = 12, height = 14, dpi = 600)
-ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship_Heatmap_AutosomesOnly.jpeg",
-       limitsize = FALSE, scale = 1, width = 12, height = 12, dpi = 600)
+ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship_Article.jpeg",
+       limitsize = FALSE, scale = 1, width = 12, height = 14, dpi = 600)
+
+
+#
+##
+### The END ~~~~~
 
 
 # Creates plot (Boxplot) ~
@@ -144,40 +149,3 @@ ggsave(Kinship_Plot_Boxplot, file = "Y150239Genomics--Kinship_Boxplot_AutosomesO
        limitsize = FALSE, scale = 1, width = 8, height = 5, dpi = 600)
 
 
-#
-##
-### The END ~~~~~
-
-
-# Melts data ~
-pops <- union(fulldf$Ind1, fulldf$Ind2)
-n <- length(pops)
-
-
-# Creates RabAutosomes_RabAllosome matrix ~
-RabAutosomes_RabAllosome <- matrix(0, nrow = n, ncol = n, dimnames = list(pops, pops))
-for (i in 1:nrow(fulldf)) {
-  RabAutosomes_RabAllosome[fulldf[i, "Ind1"], fulldf[i, "Ind2"]] = fulldf[i, "rab"]
-  RabAutosomes_RabAllosome[fulldf[i, "Ind2"], fulldf[i, "Ind1"]] = fulldf[i, "rab"]}
-
-
-# Creates & Saves the heatmap ~
-pheatmap(RabAutosomes_RabAllosome, cluster_rows = FALSE, cluster_cols = FALSE, border_color = "black",
-         cellwidth = 10, cellheight = 10, filename = "FPG--Fst.jpeg")
-
-
-
-# Melts data ~
-pops <- union(Kinship$a, Kinship$b)
-n <- length(pops)
-
-
-# Creates Kinship-Kinship matrix ~
-KinshipUp <- matrix(0, nrow = n, ncol = n, dimnames = list(pops, pops))
-for (i in 1:nrow(Kinship)) {
-  KinshipUp[Kinship[i, "a"], Kinship[i, "b"]] = Kinship[i, "rab"]
-  KinshipUp[Kinship[i, "b"], Kinship[i, "a"]] = Kinship[i, "rab"]}
-
-
-# Melts matrix ~
-fulldf <- melt(KinshipUp)

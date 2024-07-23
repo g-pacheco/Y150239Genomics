@@ -1,6 +1,6 @@
 ### The BEGINNING ~~~~~
 ##
-# NLSparrow--PCA | First written by Homère J. Alves Monteiro with later modifications by George Pacheco ~
+# Y150239Genomics--PCA by George Pacheco ~
 
 
 # Cleans the environment ~ 
@@ -40,7 +40,7 @@ PCAallo_Annot <- as.data.frame(cbind(annot, PCAallo$vectors[, c(1:3)])); colname
 
 # Merges the first 3 PCs with annot ~
 PCAauto_Annot$CHR <- "Autosomes"
-PCAallo_Annot$CHR <- "Allosome (Z)"
+PCAallo_Annot$CHR <- "Chromosome Z"
 
 
 # Binds the 2 DFs based on common columns ~
@@ -112,11 +112,11 @@ MyLegend_Plot <-
         legend.margin = margin(t = 0, b = 0, r = 15, l = 15),
         legend.box = "vertical",
         legend.box.margin = margin(t = 20, b = 30, r = 0, l = 0)) +
-  guides(starshape = guide_legend(title = "Population", title.theme = element_text(size = 16, face = "bold"),
-                                  label.theme = element_text(size = 14.25),
+  guides(starshape = guide_legend(title = "Population", title.theme = element_text(family = "Optima", size = 16, face = "bold"),
+                                  label.theme = element_text(size = 15, family = "Optima"),
                                   override.aes = list(starshape = Shapes, size = 5, starstroke = .15), nrow = 1, order = 2),
-         fill = guide_legend(title = "Species", title.theme = element_text(size = 16, face = "bold"),
-                             label.theme = element_text(size = 15),
+         fill = guide_legend(title = "Species", title.theme = element_text(family = "Optima", size = 16, face = "bold"),
+                             label.theme = element_text(size = 15, family = "Optima"),
                              override.aes = list(starshape = 21, size = 5, starstroke = .15), nrow = 1, order = 1),
          colour = "none")
 
@@ -185,8 +185,8 @@ PCAauto_12 <-
                     label.fill = "#d9d9d9", expand = unit(4, "mm"), con.border = "one", label.fontsize = 10.65,
                     con.type = "elbow", label.family = "Optima", con.cap = 0, label.hjust = .5, show.legend = FALSE) +
   scale_x_continuous("PC 1 (5.55%)",
-                     #breaks = c(0.99, 1, 1.01),
-                     #labels = c("0.99", "1", "1.01"),
+                     breaks = c(-.1, 0, .1),
+                     labels = c("-0.1", "0", ".01"),
                      limits = c(-.2, .2),
                      expand = c(0, 0)) +
   scale_y_continuous("PC 2 (1.96%)",
@@ -199,12 +199,12 @@ PCAauto_12 <-
         panel.grid.minor = element_blank(), 
         panel.grid.major = element_blank(),
         legend.position = "none",
-        axis.title.x = element_text(size = 15, face = "bold", margin = margin(t = 18, r = 0, b = 0, l = 0)),
-        axis.title.y = element_text(size = 15, face = "bold", margin = margin(t = 0, r = 18, b = 0, l = 0)),
-        axis.text.x = element_text(color = "#000000", size = 11, face = "bold", angle = 45, vjust = 1, hjust = 1),
-        axis.text.y = element_text(color = "#000000", size = 11, face = "bold"),
+        axis.title.x = element_text(family = "Optima", size = 15, face = "bold", margin = margin(t = 18, r = 0, b = 0, l = 0)),
+        axis.title.y = element_text(family = "Optima", size = 15, face = "bold", margin = margin(t = 0, r = 18, b = 0, l = 0)),
+        axis.text.x = element_text(family = "Optima", color = "#000000", size = 11, face = "bold"),
+        axis.text.y = element_text(family = "Optima", color = "#000000", size = 11, face = "bold"),
         axis.ticks = element_line(color = "#000000", linewidth = .3),
-        strip.text = element_text(colour = "#000000", size = 14, face = "bold", family = "Optima"),
+        strip.text = element_text(family = "Optima", colour = "#000000", size = 14, face = "bold"),
         strip.background = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
         axis.line = element_line(colour = "#000000", linewidth = .3))
 
@@ -217,33 +217,29 @@ PCAallo_Eigenval_Sum <- sum(PCAallo$values)
 
 
 PCAallo_12 <-
-  ggplot(data = subset(fulldf, CHR == "Allosome (Z)"), aes_string(x = "PCA_1", y = "PCA_2")) +
+  ggplot(data = subset(fulldf, CHR == "Chromosome Z"), aes_string(x = "PCA_1", y = "PCA_2")) +
   geom_star(aes(starshape = Population, fill = Species), alpha = .7, size = 2.15, starstroke = .15) +
   facet_rep_grid(CHR ~. , scales = "free_x") +
   scale_fill_manual(values = c("#1E90FF", "#FFD700", "#ee0000", "#d9d9d9")) +
   scale_starshape_manual(values = Shapes_2) +
-  geom_label_repel(data = subset(fulldf, CHR == "Allosome (Z)"), aes(label = Labels),
-                   family = ".SF Compact Rounded", size = 3.8, fontface = "bold", max.overlaps = 100, nudge_x = .040, nudge_y = -.1,
+  geom_label_repel(data = subset(fulldf, CHR == "Chromosome Z"), aes(label = Labels),
+                   family = "Optima", size = 3.8, fontface = "bold", max.overlaps = 100, nudge_x = .040, nudge_y = -.1,
                    point.padding = .6, segment.size = .3, colour = "black", fill = "#d9d9d9", alpha = .85,
                    arrow = arrow(angle = 30, length = unit(.10, "inches"),
                                  ends = "last", type = "open")) +
   geom_mark_ellipse(aes(filter = Species == "House", label = "House\nSparrow"), con.colour = "#1E90FF", colour = "#1E90FF",
                     label.fill = "#d9d9d9", expand = unit(4, "mm"), con.border = "one", label.fontsize = 10.65,
-                    con.type = "straight", label.family = ".SF Compact Rounded", con.cap = 0, label.hjust = .5, show.legend = FALSE) +
+                    con.type = "straight", label.family = "Optima", con.cap = 0, label.hjust = .5, show.legend = FALSE) +
   geom_mark_ellipse(aes(filter = Species == "Spanish", label = "Spanish\nSparrow"), con.colour = "#ee0000", colour = "#ee0000",
                     label.fill = "#d9d9d9", expand = unit(4, "mm"), con.border = "one", label.fontsize = 10.65,
-                    con.type = "elbow", label.family = ".SF Compact Rounded", con.cap = 0, label.hjust = .5, show.legend = FALSE) +
+                    con.type = "elbow", label.family = "Optima", con.cap = 0, label.hjust = .5, show.legend = FALSE) +
   geom_mark_ellipse(aes(filter = Species == "Italian", label = "Italian\nSparrow"), con.colour = "#FFD700", colour = "#FFD700",
                     label.fill = "#d9d9d9", expand = unit(4, "mm"), con.border = "one", label.fontsize = 10.65,
-                    con.type = "elbow", label.family = ".SF Compact Rounded", con.cap = 0, label.hjust = .5, show.legend = FALSE) +
+                    con.type = "elbow", label.family = "Optima", con.cap = 0, label.hjust = .5, show.legend = FALSE) +
   scale_x_continuous("PC 1 (8.76%)",
-                     #breaks = c(0.99, 1, 1.01),
-                     #labels = c("0.99", "1", "1.01"),
                      limits = c(-.17, .19),
                      expand = c(0, 0)) +
   scale_y_continuous("PC 2 (4.19%)",
-                     #breaks = c(-.08, -.04, 0.00), 
-                     #labels = c("-0.08", "-0.04", "0.00"),
                      limits = c(-.31, .35),
                      expand = c(0, 0)) +
   theme(panel.background = element_rect(fill = "#ffffff"),
@@ -251,22 +247,14 @@ PCAallo_12 <-
         panel.grid.minor = element_blank(), 
         panel.grid.major = element_blank(),
         legend.position = "none",
-        axis.title.x = element_text(size = 15, face = "bold", margin = margin(t = 18, r = 0, b = 0, l = 0)),
-        axis.title.y = element_text(size = 15, face = "bold", margin = margin(t = 0, r = 18, b = 0, l = 0)),
-        axis.text.x = element_text(color = "#000000", size = 11, face = "bold", angle = 45, vjust = 1, hjust = 1),
-        axis.text.y = element_text(color = "#000000", size = 11, face = "bold"),
+        axis.title.x = element_text(family = "Optima", size = 15, face = "bold", margin = margin(t = 18, r = 0, b = 0, l = 0)),
+        axis.title.y = element_text(family = "Optima", size = 15, face = "bold", margin = margin(t = 0, r = 18, b = 0, l = 0)),
+        axis.text.x = element_text(family = "Optima", color = "#000000", size = 11, face = "bold"),
+        axis.text.y = element_text(family = "Optima", color = "#000000", size = 11, face = "bold"),
         axis.ticks = element_line(color = "#000000", linewidth = .3),
-        strip.text = element_text(colour = "#000000", size = 13, family = "Optima", face = "bold"),
+        strip.text = element_text(family = "Optima", colour = "#000000", size = 14, face = "bold"),
         strip.background = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
         axis.line = element_line(colour = "#000000", linewidth = .3))
-
-
-# Isolates legend ~
-MyLegendBlog <- get_legend(MyLegend_Plot)
-
-
-# Gets final plot ~
-PCA_Plot <- ggarrange(PCAauto_12, nrow = 1, legend.grob = MyLegendBlog)
 
 
 # Isolates legend ~
@@ -278,37 +266,12 @@ PCA_Plot <- ggarrange(PCAauto_12, PCAallo_12, nrow = 2, legend.grob = MyLegendBl
 
 
 # Saves plot ~
-ggsave(PCA_Plot, file = "YYY.pdf",
-       device = cairo_pdf, limitsize = FALSE, scale = 1, width = 11, height = 11, dpi = 600)
-ggsave(PCA_Plot, file = "Presentation.jpeg",
-      limitsize = FALSE, scale = 1.1, width = 11, height = 11, dpi = 600)
+ggsave(PCA_Plot, file = "Y150239Genomics--PCA.pdf",
+       device = cairo_pdf, limitsize = FALSE, scale = 1, width = 12, height = 12, dpi = 600)
+ggsave(PCA_Plot, file = "Y150239Genomics--PCA.png",
+      limitsize = FALSE, scale = 1, width = 12, height = 12, dpi = 600)
 
 
 #
 ##
 ### The END ~~~~~
-
-
-geom_label_repel(data = subset(fulldf, CHR == "Autosomes"), aes(label = Sample_ID),
-                 family = "Optima", size = 3.8, fontface = "bold", max.overlaps = 100, nudge_x = .055, nudge_y = .05,
-                 point.padding = .6, force_pull = 10, segment.size = .3, colour = "black", fill = "#d9d9d9", alpha = .85,
-                 arrow = arrow(angle = 30, length = unit(.10, "inches"),
-                               ends = "last", type = "open")) +
-
-cov <- list()
-covL <- dir(pattern = ".res")
-for (k in 1:length(covL)){
-  cov[[k]] <- read.table(annotL[k], sep = "\t", header = FALSE, stringsAsFactors = FALSE)
-  colnames(cov[[k]]) <- c("Ind1")
-  cov[[k]]$Ind2 <- c(cov[[k]]$Ind1[-c(1)], NA)
-  cov[[k]]$Population <- gsub("[A-z._]*(Autosomes|Allosome).", "", annotL[k])
-  cov[[k]]$Population <- gsub(".labels", "", annot[[k]]$Population)
-  cov[[k]]$CHRType <- str_extract(annotL[k], "(Allosome|Autosomes)")
-  cov[[k]]$Ind1b <- paste(annot[[k]]$Population, sprintf("%02d", 1:nrow(annot[[k]])), sep = "_")
-  cov[[k]]$Ind2b <- paste(annot[[k]]$Population, sprintf("%02d", 2:nrow(annot[[k]])), sep = "_")
-  rab[[k]]$Ind1 <- annot[[k]]$Ind1b[match(rab[[k]]$a, seq_along(annot[[k]]$Ind1b))]
-  rab[[k]]$Ind2 <- annot[[k]]$Ind2b[match(rab[[k]]$b, seq_along(annot[[k]]$Ind2b))]
-  rab[[k]]$a <- annot[[k]]$Ind1[match(rab[[k]]$a, seq_along(annot[[k]]$Ind1))]
-  rab[[k]]$b <- annot[[k]]$Ind2[match(rab[[k]]$b, seq_along(annot[[k]]$Ind2))]
-  rab[[k]]$Pair <- paste(rab[[k]]$Ind1,"Vs",rab[[k]]$Ind2)
-  rab[[k]] <- rab[[k]] %>% select(Ind1, Ind2, a, b, rab, Pair, CHRType, Population)}
