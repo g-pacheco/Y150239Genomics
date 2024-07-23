@@ -174,9 +174,9 @@ Y150239Genomics_Stat <-
 
 
 # Saves the panel ~
-ggsave(Y150239Genomics_Stat, file = "Y150239Genomics--Stats_Article.pdf",
+ggsave(Y150239Genomics_Stat, file = "Y150239Genomics--Stats.pdf",
        device = cairo_pdf, width = 12, height = 17, scale = 1, dpi = 600)
-ggsave(Y150239Genomics_Stat, file = "Y150239Genomics--Stats_Article.png",
+ggsave(Y150239Genomics_Stat, file = "Y150239Genomics--Stats.png",
        width = 12, height = 17, scale = 1, dpi = 600)
 
 
