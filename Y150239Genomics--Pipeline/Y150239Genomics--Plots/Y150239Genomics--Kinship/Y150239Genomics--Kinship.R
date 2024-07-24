@@ -94,9 +94,9 @@ Kinship_Plot_Heatmap <-
 
 
 # Saves plot (Heatmap) ~
-ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship_Article.pdf",
+ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship.pdf",
        device = cairo_pdf, limitsize = FALSE, scale = 1, width = 12, height = 14, dpi = 600)
-ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship_Article.jpeg",
+ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship.png",
        limitsize = FALSE, scale = 1, width = 12, height = 14, dpi = 600)
 
 

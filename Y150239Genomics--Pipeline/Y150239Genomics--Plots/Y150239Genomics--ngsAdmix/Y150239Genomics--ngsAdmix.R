@@ -1,6 +1,6 @@
 ### The BEGINNING ~~~~~
 ##
-# ~ Plots Y150239Genomics--ngsAdmix | Written by Jose Samaniego & George Pacheco.
+# ~ Plots Y150239Genomics--ngsAdmix by Jose Samaniego & George Pacheco.
 
 
 # Cleans the environment ~ 

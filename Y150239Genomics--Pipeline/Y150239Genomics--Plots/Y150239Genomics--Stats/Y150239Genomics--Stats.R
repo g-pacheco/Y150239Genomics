@@ -1,6 +1,6 @@
 ### The BEGINNING ~~~~~
 ##
-# ~ Plots Y1502239Genomics--Stats | By George Pacheco.
+# ~ Plots Y1502239Genomics--Stats by George Pacheco.
 
 
 # Cleans the environment ~ 

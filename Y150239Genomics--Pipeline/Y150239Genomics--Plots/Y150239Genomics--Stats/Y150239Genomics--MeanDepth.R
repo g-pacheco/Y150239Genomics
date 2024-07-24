@@ -1,6 +1,6 @@
 ### The BEGINNING ~~~~~
 ##
-# ~ Creates Y150239Genomics--GlobalDepth | By George Pacheco.
+# ~ Creates Y150239Genomics--GlobalDepth by George Pacheco.
 
 
 # Cleans the environment ~ 
@@ -104,9 +104,9 @@ GlobalCoverage <-
 
   
 # Saves plot ~
-ggsave(GlobalCoverage, file = "Y150239Genomics--MeanDepth_Article.pdf",
+ggsave(GlobalCoverage, file = "Y150239Genomics--MeanDepth.pdf",
        width = 12, height = 12, scale = 1, device = cairo_pdf, dpi = 600)
-ggsave(GlobalCoverage, file = "Y150239Genomics--MeanDepth_Article.jpg",
+ggsave(GlobalCoverage, file = "Y150239Genomics--MeanDepth.png",
        width = 12, height = 12, scale = 1, dpi = 600)
 
 
