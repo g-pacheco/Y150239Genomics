@@ -1,6 +1,6 @@
 ### The BEGINNING ~~~~~
 ##
-# Y150239Genomics--TWISST | by George Pacheco ~
+# Y150239Genomics--TWISST by George Pacheco ~
 
 
 # Cleans the environment ~ 
@@ -283,7 +283,9 @@ Panel_Plot <- Y150239_Plot + Meerkerk_Plot + Delta_Plot + plot_layout(ncol = 1)
   
 # Save the panel ~
 ggsave(paste("Y150239Genomics--TWISST_FillArea_", x, ".pdf", sep = ""), plot = Panel_Plot,
-       device = cairo_pdf, limitsize = FALSE, width = 40, height = 25, scale = 1, dpi = 600)}
+       device = cairo_pdf, limitsize = FALSE, width = 40, height = 25, scale = 1, dpi = 600)
+ggsave(paste("Y150239Genomics--TWISST_FillArea_", x, ".png", sep = ""), plot = Panel_Plot,
+       limitsize = FALSE, width = 40, height = 25, scale = 1, dpi = 600)}
 
 
 
