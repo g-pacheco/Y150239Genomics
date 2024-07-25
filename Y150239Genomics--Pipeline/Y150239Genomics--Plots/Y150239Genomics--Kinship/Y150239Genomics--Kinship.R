@@ -100,11 +100,6 @@ ggsave(Kinship_Plot_Heatmap, file = "Y150239Genomics--Kinship.png",
        limitsize = FALSE, scale = 1, width = 12, height = 14, dpi = 600)
 
 
-#
-##
-### The END ~~~~~
-
-
 # Creates plot (Boxplot) ~
 Kinship_Plot_Boxplot <-
   ggplot(fulldf, aes(x = Population, y = rab)) +
@@ -113,7 +108,7 @@ Kinship_Plot_Boxplot <-
   geom_point(data = subset(fulldf, rab >= .125), shape = 21, fill = "#df65b0", colour = "#000000", stroke = .2, alpha = .9) +
   geom_hline(yintercept = .125, linetype = "twodash", color = "#df65b0", linewidth = .3, alpha = .9) +
   geom_label_repel(data = subset(fulldf, rab >= .125), aes(label = Pair),
-                   size = 3, nudge_x = .1, fontface = "bold", family = "Optima") +
+                   size = 3, nudge_x = .1, family = "Optima", fontface = "bold") +
   scale_x_discrete(expand = c(.05, .05)) +
   scale_y_continuous ("Rab", 
                       breaks = c(.1, .2, .3, .4, .5), 
@@ -131,21 +126,23 @@ Kinship_Plot_Boxplot <-
         legend.box = "vertical",
         legend.box.margin = margin(t = 20, b = 30, r = 0, l = 0),
         axis.title.x = element_blank(),
-        axis.title.y = element_text(color = "#000000", size = 12, face = "bold", margin = margin(t = 0, r = 20, b = 0, l = 0)),
-        axis.text.x = element_text(color = "#000000", size = 10, face = "bold", angle = 45, vjust = 1, hjust = 1),
-        axis.text.y = element_text(color = "#000000", size = 9, face = "bold"),
+        axis.title.y = element_text(family = "Optima", color = "#000000", size = 12, face = "bold", margin = margin(t = 0, r = 20, b = 0, l = 0)),
+        axis.text.x = element_text(family = "Optima", color = "#000000", size = 10, face = "bold", angle = 45, vjust = 1, hjust = 1),
+        axis.text.y = element_text(family = "Optima", color = "#000000", size = 9, face = "bold"),
         axis.ticks = element_line(color = "#000000", linewidth = .3),
-        strip.text = element_text(colour = "#000000", size = 14, face = "bold", family = "Optima"),
+        strip.text = element_text(family = "Optima", colour = "#000000", size = 14, face = "bold"),
         strip.background = element_rect(colour = "#000000", fill = "#d6d6d6", linewidth = .3),
         axis.line = element_line(colour = "#000000", linewidth = .3)) +
-  guides(fill = guide_legend(title = "Rab", title.theme = element_text(size = 16, face = "bold"),
-                             label.theme = element_text(size = 15)))
+  guides(fill = guide_legend(title = "Rab", title.theme = element_text(family = "Optima", size = 16, face = "bold"),
+                             label.theme = element_text(family = "Optima", size = 15)))
 
 
 # Saves plot (Boxplot) ~
 ggsave(Kinship_Plot_Boxplot, file = "Y150239Genomics--Kinship_Boxplot.pdf",
        device = cairo_pdf, limitsize = FALSE, scale = 1, width = 8, height = 5, dpi = 600)
-ggsave(Kinship_Plot_Boxplot, file = "Y150239Genomics--Kinship_Boxplot_AutosomesOnly.jpeg",
+ggsave(Kinship_Plot_Boxplot, file = "Y150239Genomics--Kinship_Boxplot.png",
        limitsize = FALSE, scale = 1, width = 8, height = 5, dpi = 600)
 
-
+#
+##
+### The END ~~~~~
