@@ -96,11 +96,9 @@ y_strip_labels <- c("chr1" = "CHR 01", "chr1A" = "CHR 01A", "chr2" = "CHR 02", "
 
 
 generate_dynamic_breaks_and_labels <- function(min_val, max_val) {
-  if (max_val <= 0) {
-    return(list(breaks = c(1), labels = c("1Mb")))  # Handling edge case for empty scaffolds
-  }
+  if (max_val <= 0) {return(list(breaks = c(1), labels = c("1Mb")))}
   
-  # Determine appropriate step size based on data range
+  # Determines appropriate step size based on data range ~
   data_range <- max_val - min_val
   if (data_range <= 1300000) {
     step_size <- 100000
@@ -113,31 +111,27 @@ generate_dynamic_breaks_and_labels <- function(min_val, max_val) {
   } else if (data_range <= 100000000) {
     step_size <- 5000000
   } else {
-    step_size <- 20000000
-  }
+    step_size <- 20000000}
   
-  # Generate breaks starting from the rounded min_val
+  # Generates breaks starting from the rounded min_val ~
   rounded_min_val <- floor(min_val / step_size) * step_size
   breaks <- seq(from = rounded_min_val, to = max_val, by = step_size)
   
-  # Ensure breaks are within the actual data range
+  # Ensures breaks are within the actual data range ~
   breaks <- breaks[breaks >= min_val & breaks <= max_val]
   
-  # Generate labels corresponding to the breaks
+  # Generates labels corresponding to the breaks ~
   if (step_size >= 1e6) {
     labels <- paste0(breaks / 1e6, "Mb")
   } else {
-    labels <- paste0(round(breaks / 1e5) / 10, "Mb")
-  }
+    labels <- paste0(round(breaks / 1e5) / 10, "Mb")}
   
-  # Ensure breaks and labels have the same length
+  # Ensures breaks and labels have the same length ~
   if (length(breaks) != length(labels)) {
-    stop("Breaks and labels have different lengths.")
-  }
-  return(list(breaks = breaks, labels = labels))
-}
+    stop("Breaks and labels have different lengths.")}
+  return(list(breaks = breaks, labels = labels))}
 
-# Apply the function to each unique CHR
+# Applies the function to each unique CHR ~
 patterns <- unique(fulldfUp$CHR)
 
 

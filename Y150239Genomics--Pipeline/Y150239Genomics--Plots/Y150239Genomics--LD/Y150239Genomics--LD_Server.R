@@ -348,20 +348,14 @@ if(opt$fit_level > 0) {
   lgr$debug("Fit data", data = toJSON(head(fit_data, n = 10)))}
 
 
-# Loads computations performed on Saga due to memory requirements ~
-load("Save.RData")
-
-
 # Expands fit_data & ld_data by adding a CHRType column ~
-fit_data$CHRType <- ifelse(grepl("Allosome", fit_data$File) & grepl("NoTreeSparrow", fit_data$File), "ChromosomeZ I",
-                    ifelse(grepl("Allosome", fit_data$File) & grepl("TreeSparrow", fit_data$File), "ChromosomeZ II",
-                    ifelse(grepl("Autosomes", fit_data$File) & grepl("NoTreeSparrow", fit_data$File), "Autosomes I",
-                    ifelse(grepl("Autosomes", fit_data$File) & grepl("TreeSparrow", fit_data$File), "Autosomes II", "Error"))))
+fit_data$CHRType <- str_extract(fit_data$File, "(Allosome|Autosomes)")
+ld_data$CHRType <- str_extract(ld_data$File, "(Allosome|Autosomes)")
 
-ld_data$CHRType <- ifelse(grepl("Allosome", ld_data$File) & grepl("NoTreeSparrow", ld_data$File), "ChromosomeZ I",
-                   ifelse(grepl("Allosome", ld_data$File) & grepl("TreeSparrow", ld_data$File), "ChromosomeZ II",
-                   ifelse(grepl("Autosomes", ld_data$File) & grepl("NoTreeSparrow", ld_data$File), "Autosomes I",
-                   ifelse(grepl("Autosomes", ld_data$File) & grepl("TreeSparrow", ld_data$File), "Autosomes II", "Error"))))
+
+# Corrects Population names ~
+levels(fit_data$CHRType <- sub("Allosome", "Chromossome Z", fit_data$CHRType))
+levels(ld_data$CHRType <- sub("Allosome", "Chromossome Z", ld_data$CHRType))
 
 
 # Expands fit_data & ld_data by adding a PruningState column ~
@@ -369,11 +363,11 @@ fit_data$PruningState <- ifelse(grepl("Pruned", fit_data$File), "Pruned", "Not P
 ld_data$PruningState <- ifelse(grepl("Pruned", ld_data$File), "Pruned", "Not Pruned")
 
 
-# Reorders Sataset ~
+# Reorders CHRType ~
 fit_data$CHRType <- factor(fit_data$CHRType, ordered = TRUE,
-                          levels = c("Autosomes I", "ChromosomeZ I", "Autosomes II", "ChromosomeZ II"))
+                        levels = c("Autosomes", "Chromossome Z"))
 ld_data$CHRType <- factor(ld_data$CHRType, ordered = TRUE,
-                         levels = c("Autosomes I", "ChromosomeZ I", "Autosomes II", "ChromosomeZ II"))
+                       levels = c("Autosomes", "Chromossome Z"))
 
 
 # Reorders PruningState ~
